@@ -4,13 +4,13 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document
+@Document("secrets")
 data class SecretsEntity(
     @Id
     val _id: ObjectId = ObjectId.get(),
-    val username: String,
-    val password: String,
-    val description: String,
-    val tags: List<String>,
-    val searchKey: String
+    var username: String,
+    var password: String,
+    var description: String,
+    var tags: List<String>,
+    var searchKey: String
 )
