@@ -8,7 +8,6 @@ import com.shadowsafe.secretsmanagerbackend.secret.repository.SecretsRepository
 import com.shadowsafe.secretsmanagerbackend.secret.service.SecretsService
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -19,32 +18,21 @@ class SecretServiceImpl(
 ) : SecretsService {
     override fun getAllSecrets(pageNo: Int, pageSize: Int, search: String): GetSecretsResponseDTO {
         val pageable: Pageable = PageRequest.of(pageNo, pageSize)
-        var secretsList = listOf<SecretsResponseDTO>()
-        var secrets: Page<SecretsEntity>
-        if (search.isNullOrEmpty()) {
-            secrets = secretsRepository.findAll(pageable)
-            secretsList = secrets.content.map { item ->
-                SecretsResponseDTO(
-                    item._id.toHexString(),
-                    item.username,
-                    "*******",
-                    item.description,
-                    item.tags,
-                )
-            }
+        val secrets = if (search.isNullOrEmpty()) {
+            secretsRepository.findAll(pageable)
         } else {
-            secrets = secretsRepository.findBySearchKeyContainingIgnoreCase(search, pageable)
-            secretsList = secrets.content.map { item ->
-                SecretsResponseDTO(
-                    item._id.toHexString(),
-                    item.username,
-                    "*******",
-                    item.description,
-                    item.tags,
-                )
-            }
+            secretsRepository.findBySearchKeyContainingIgnoreCase(search, pageable)
         }
-        return GetSecretsResponseDTO(secretsList, pageNo, pageSize, secrets.totalPages)
+        val secretsList = secrets.content.map { item ->
+            SecretsResponseDTO(
+                item._id.toHexString(),
+                item.username,
+                "*******",
+                item.description,
+                item.tags,
+            )
+        }
+        return GetSecretsResponseDTO(secretsList, pageNo, pageSize, secrets.numberOfElements)
     }
 
     override fun getSecretDetails(id: String): SecretsResponseDTO {
@@ -64,26 +52,26 @@ class SecretServiceImpl(
     }
 
     override fun saveSecrets(request: SaveSecretsRequestDTO) {
-        if (request.id.isNullOrEmpty()) {
-            secretsRepository.save(
-                SecretsEntity(
-                    username = request.username,
-                    password = request.password,
-                    description = request.description,
-                    tags = request.tags,
-                    searchKey = "${request.username} ${request.description} ${request.tags.joinToString(" ")}",
-                ),
-            )
-        } else {
-            val secretOptional = secretsRepository.findById(request.id)
-            if (secretOptional.isEmpty) throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND)
-            val secret = secretOptional.get()
-            secret.username = request.username
-            secret.password = request.password
-            secret.description = request.description
-            secret.tags = request.tags
-            secret.searchKey = "${request.username} ${request.description} ${request.tags.joinToString(" ")}"
-            secretsRepository.save(secret)
-        }
+        secretsRepository.save(
+            SecretsEntity(
+                username = request.username,
+                password = request.password,
+                description = request.description,
+                tags = request.tags,
+                searchKey = "${request.username} ${request.description} ${request.tags.joinToString(" ")}",
+            ),
+        )
+    }
+
+    override fun editSecrets(request: SaveSecretsRequestDTO, id: String) {
+        val secretOptional = secretsRepository.findById(id)
+        if (secretOptional.isEmpty) throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND)
+        val secret = secretOptional.get()
+        secret.username = request.username
+        secret.password = request.password
+        secret.description = request.description
+        secret.tags = request.tags
+        secret.searchKey = "${request.username} ${request.description} ${request.tags.joinToString(" ")}"
+        secretsRepository.save(secret)
     }
 }

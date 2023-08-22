@@ -7,5 +7,5 @@ data class SecretsResponseDTO(
     val username: String,
     val password: String,
     val description: String,
-    val tags: List<String>
-): IDTO
+    val tags: List<String>,
+) : IDTO

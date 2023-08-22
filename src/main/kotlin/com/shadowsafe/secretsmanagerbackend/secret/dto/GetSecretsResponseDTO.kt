@@ -6,5 +6,5 @@ data class GetSecretsResponseDTO(
     val secrets: List<SecretsResponseDTO>,
     val pageNo: Int,
     val pageSize: Int,
-    val totalNoPages: Int,
+    val totalSize: Int,
 ) : IDTO
