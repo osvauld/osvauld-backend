@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -18,7 +19,7 @@ class SecretsController(
 ) {
 
     @GetMapping("/secrets")
-    fun getAllSecrets(@RequestParam(name = "pageNo") pageNo: Int, @RequestParam(name = "pageSize") pageSize: Int, @RequestParam search: String): ResponseEntity<ResponseDTO> {
+    fun getAllSecrets(@RequestParam(name = "_page") pageNo: Int, @RequestParam(name = "_limit") pageSize: Int, @RequestParam search: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
             secretsService.getAllSecrets(pageNo, pageSize, search),
@@ -36,6 +37,15 @@ class SecretsController(
     @PostMapping("/secrets")
     fun saveSecrets(@RequestBody request: SaveSecretsRequestDTO): ResponseEntity<ResponseDTO> {
         secretsService.saveSecrets(request)
+        return createSuccessResponse(
+            "Success",
+            null,
+        )
+    }
+
+    @PutMapping("/secrets/{id}")
+    fun editSecrets(@PathVariable(name = "id") id: String, @RequestBody request: SaveSecretsRequestDTO): ResponseEntity<ResponseDTO> {
+        secretsService.editSecrets(request, id)
         return createSuccessResponse(
             "Success",
             null,

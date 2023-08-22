@@ -1,7 +1,6 @@
 package com.shadowsafe.secretsmanagerbackend.secret.dto
 
 data class SaveSecretsRequestDTO(
-    val id: String,
     val username: String,
     val password: String,
     val description: String,
