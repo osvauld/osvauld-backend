@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SecretsManagerBackendApplication
 
 fun main(args: Array<String>) {
-	runApplication<SecretsManagerBackendApplication>(*args)
+    runApplication<SecretsManagerBackendApplication>(*args)
 }

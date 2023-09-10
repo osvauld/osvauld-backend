@@ -1,4 +1,4 @@
-package com.kottoor.finServe.dto.shared.rest
+package com.shadowsafe.secretsmanagerbackend.dto.shared.rest
 
 //
 // import com.fasterxml.jackson.annotation.JsonProperty

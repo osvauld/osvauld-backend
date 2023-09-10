@@ -4,5 +4,5 @@ data class SaveSecretsRequestDTO(
     val username: String,
     val password: String,
     val description: String,
-    val tags: List<String>
+    val tags: List<String>,
 )
