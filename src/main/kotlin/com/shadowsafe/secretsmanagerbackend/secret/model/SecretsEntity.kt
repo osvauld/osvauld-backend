@@ -12,5 +12,5 @@ data class SecretsEntity(
     var password: String,
     var description: String,
     var tags: List<String>,
-    var searchKey: String
+    var searchKey: String,
 )

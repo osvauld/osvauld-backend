@@ -12,4 +12,6 @@ interface SecretsService {
     fun getSecretDetails(id: String): SecretsResponseDTO
 
     fun saveSecrets(request: SaveSecretsRequestDTO)
+
+    fun editSecrets(request: SaveSecretsRequestDTO, id: String)
 }

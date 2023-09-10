@@ -1,0 +1,44 @@
+package com.shadowsafe.secretsmanagerbackend.usermanagement.controller
+
+import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
+import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
+import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
+import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
+import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CreateUserRequestDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.service.UsersService
+import org.springframework.http.HttpRequest
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpServletRequest
+
+@RestController
+class UsersController(
+    private val usersService: UsersService,
+) {
+    @GetMapping("/users")
+    fun getAllSecrets(@RequestParam(name = "_page") pageNo: Int, @RequestParam(name = "_limit") pageSize: Int): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            usersService.getAllUsers(pageNo, pageSize),
+        )
+    }
+
+    @PostMapping("/users", "/public/users")
+    fun saveSecrets(@RequestBody request: CreateUserRequestDTO, httpRequest: HttpServletRequest): ResponseEntity<ResponseDTO> {
+        if (httpRequest.requestURI == "/public/users") {
+            if (usersService.checkIfAdminPresent().isPresent) throw GenericException(GenericErrorCodes.ADMIN_ALREADY_CREATED)
+        }
+        usersService.createUser(request)
+        return createSuccessResponse(
+            "Success",
+            null,
+        )
+    }
+    @GetMapping("/public/admin-check")
+    fun checkIsAdminPresent(): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            usersService.checkIfAdminPresent(),
+        )
+    }
+}
