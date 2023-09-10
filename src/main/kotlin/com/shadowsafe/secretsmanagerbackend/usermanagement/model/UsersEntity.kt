@@ -13,5 +13,5 @@ data class UsersEntity(
     val password: String,
     val tags: List<String>?,
     val isActive: Boolean,
-    val isAdmin: Boolean
+    val isAdmin: Boolean,
 )

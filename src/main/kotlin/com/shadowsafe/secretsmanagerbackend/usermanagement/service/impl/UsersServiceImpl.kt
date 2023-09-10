@@ -1,27 +1,35 @@
 package com.shadowsafe.secretsmanagerbackend.usermanagement.service.impl
 
+import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CheckIfAdminResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CreateUserRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.GetUsersResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.UsersResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.model.UsersEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.repository.UsersRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.service.UsersService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UsersServiceImpl(
     private val usersRepository: UsersRepository,
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
 ) : UsersService {
+
+    @Value("\${createAdmin.token}")
+    lateinit var createAdminToken: String
+
     override fun createUser(request: CreateUserRequestDTO) {
         usersRepository.save(
             UsersEntity(
                 email = request.username,
-                password = request.password,
+                password = bCryptPasswordEncoder.encode(request.password),
                 isActive = true,
                 isAdmin = request.isAdmin,
-                name = "",
+                name = request.name ?: "",
                 tags = emptyList(),
             ),
         )
@@ -44,5 +52,20 @@ class UsersServiceImpl(
             pageSize,
             users.numberOfElements,
         )
+    }
+
+    override fun checkIfAdminPresent(): CheckIfAdminResponseDTO {
+        val adminUser = usersRepository.findAdminUsers()
+        if (adminUser.isNullOrEmpty()) {
+            return CheckIfAdminResponseDTO(
+                token = createAdminToken,
+                isPresent = false,
+            )
+        } else {
+            return CheckIfAdminResponseDTO(
+                token = "",
+                isPresent = true,
+            )
+        }
     }
 }
