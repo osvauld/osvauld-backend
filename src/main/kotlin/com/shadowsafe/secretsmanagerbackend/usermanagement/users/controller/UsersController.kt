@@ -1,12 +1,11 @@
-package com.shadowsafe.secretsmanagerbackend.usermanagement.controller
+package com.shadowsafe.secretsmanagerbackend.usermanagement.users.controller
 
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
-import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CreateUserRequestDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.service.UsersService
-import org.springframework.http.HttpRequest
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CreateUserRequestDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest

@@ -1,12 +1,12 @@
-package com.shadowsafe.secretsmanagerbackend.usermanagement.service.impl
+package com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.impl
 
-import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CheckIfAdminResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.CreateUserRequestDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.GetUsersResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.dto.UsersResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.model.UsersEntity
-import com.shadowsafe.secretsmanagerbackend.usermanagement.repository.UsersRepository
-import com.shadowsafe.secretsmanagerbackend.usermanagement.service.UsersService
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CheckIfAdminResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CreateUserRequestDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GetUsersResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.UsersResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
