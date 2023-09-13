@@ -1,6 +1,6 @@
 package com.shadowsafe.secretsmanagerbackend.security.service
 
-import com.shadowsafe.secretsmanagerbackend.usermanagement.repository.UsersRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User

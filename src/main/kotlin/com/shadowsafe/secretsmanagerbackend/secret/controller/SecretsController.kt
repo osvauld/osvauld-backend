@@ -51,4 +51,12 @@ class SecretsController(
             null,
         )
     }
+
+    @GetMapping("/folder/structure")
+    fun getFolderStructure(): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            null
+        )
+    }
 }

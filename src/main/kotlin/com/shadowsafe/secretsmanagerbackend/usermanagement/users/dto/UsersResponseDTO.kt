@@ -1,4 +1,4 @@
-package com.shadowsafe.secretsmanagerbackend.usermanagement.dto
+package com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto
 
 data class UsersResponseDTO(
     val username: String,

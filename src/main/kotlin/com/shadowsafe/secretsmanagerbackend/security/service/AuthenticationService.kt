@@ -5,7 +5,7 @@ import com.shadowsafe.secretsmanagerbackend.security.dto.LoginDTO
 import com.shadowsafe.secretsmanagerbackend.security.dto.LoginResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.GenericSuccessResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.repository.UsersRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys

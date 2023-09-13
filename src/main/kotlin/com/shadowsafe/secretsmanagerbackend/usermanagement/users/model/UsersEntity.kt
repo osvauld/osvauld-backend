@@ -1,4 +1,4 @@
-package com.shadowsafe.secretsmanagerbackend.usermanagement.model
+package com.shadowsafe.secretsmanagerbackend.usermanagement.users.model
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -11,7 +11,6 @@ data class UsersEntity(
     val email: String,
     val name: String,
     val password: String,
-    val tags: List<String>?,
-    val isActive: Boolean,
+    val role: List<String>,
     val isAdmin: Boolean,
 )

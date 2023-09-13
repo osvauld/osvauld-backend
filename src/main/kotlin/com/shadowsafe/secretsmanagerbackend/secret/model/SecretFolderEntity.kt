@@ -4,12 +4,12 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("secrets")
-data class SecretsEntity(
+@Document("secret_folders")
+data class SecretFolderEntity(
     @Id
     val _id: ObjectId = ObjectId.get(),
-    var name: String,
-    var description: String,
-    var credentials: Map<String, String>,
-    var parents: List<String>
+    val name: String,
+    val parents: List<String>,
+    val children: List<String>,
+    val secrets: List<String>
 )

@@ -1,6 +1,6 @@
-package com.shadowsafe.secretsmanagerbackend.usermanagement.repository
+package com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository
 
-import com.shadowsafe.secretsmanagerbackend.usermanagement.model.UsersEntity
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.stereotype.Repository
