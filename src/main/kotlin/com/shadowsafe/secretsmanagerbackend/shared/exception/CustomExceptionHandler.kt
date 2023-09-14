@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import javax.naming.AuthenticationException
 
 @RestControllerAdvice(basePackages = ["com.shadowsafe.secretsmanagerbackend"])
 class CustomExceptionHandler : ResponseEntityExceptionHandler() {
@@ -88,6 +89,18 @@ class CustomExceptionHandler : ResponseEntityExceptionHandler() {
         )
     }
 
+    @ExceptionHandler(AuthenticationException::class)
+    fun handleAuthenticationExceptions(
+        ex: GenericException,
+        request: WebRequest,
+    ): ResponseEntity<ResponseDTO> {
+        return createErrorResponse(
+            HttpStatus.UNAUTHORIZED,
+            "User not authorised",
+            "Unauthorised",
+        )
+    }
+
     @ExceptionHandler(HttpServerErrorException.InternalServerError::class)
     fun handleInternalServerExceptions(
         ex: HttpServerErrorException.InternalServerError,
@@ -96,7 +109,7 @@ class CustomExceptionHandler : ResponseEntityExceptionHandler() {
         return createErrorResponse(
             HttpStatus.CONFLICT,
             ex.localizedMessage,
-            "FinServe Application Error",
+            "Secrets Manager Application Error",
         )
     }
 
