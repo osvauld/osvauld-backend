@@ -3,13 +3,16 @@ package com.shadowsafe.secretsmanagerbackend.folders.model
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDateTime
 
 @Document("folders")
 data class FolderEntity(
     @Id
     val _id: ObjectId = ObjectId.get(),
-    val name: String?,
-    val parents: List<String>?,
-    val children: List<String>?,
-    val secrets: List<String>?
+    var name: String,
+    var parents: ArrayList<String>,
+    var children: ArrayList<String>,
+    var secrets: ArrayList<String>,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime
 )
