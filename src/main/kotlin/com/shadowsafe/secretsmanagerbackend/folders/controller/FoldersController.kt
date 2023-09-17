@@ -1,7 +1,6 @@
- 
 package com.shadowsafe.secretsmanagerbackend.folders.controller
 
-import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderDTO
+import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderRequestDTO
 import com.shadowsafe.secretsmanagerbackend.folders.service.FoldersService
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
@@ -26,7 +25,7 @@ class FoldersController(
     }
 
     @PostMapping("/folders")
-    fun saveSecrets(@RequestBody request: FolderDTO): ResponseEntity<ResponseDTO> {
+    fun saveFolder(@RequestBody request: FolderRequestDTO): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
             foldersService.saveFolders(request),
