@@ -31,4 +31,20 @@ class FoldersController(
             foldersService.saveFolders(request),
         )
     }
+
+    @PostMapping("/folders/structure")
+    fun createNewFolderStructureForOrganisation(): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            foldersService.createNewFolderStructureForOrganisation()
+        )
+    }
+
+    @GetMapping("/folders/structure/{organisationId}")
+    fun getFolderStructure(@PathVariable(name = "organisationId") organisationId: String): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            foldersService.getFolderStructureForOrganisation(organisationId)
+        )
+    }
 }
