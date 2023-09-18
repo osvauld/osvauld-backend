@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class FolderEntity(
     @Id
     val _id: ObjectId = ObjectId.get(),
-    var name: String,
+    var label: String,
     var parents: ArrayList<String>,
     var children: ArrayList<String>,
     var secrets: ArrayList<String>,

@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class FolderDTO(
     var id: String?,
-    var name: String?,
+    var label: String?,
     var parents: List<String>?,
     var children: List<String>?,
     var secrets: List<String>?,
