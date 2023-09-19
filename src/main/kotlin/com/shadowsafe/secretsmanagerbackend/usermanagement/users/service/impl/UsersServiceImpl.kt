@@ -27,10 +27,11 @@ class UsersServiceImpl(
             UsersEntity(
                 email = request.username,
                 password = bCryptPasswordEncoder.encode(request.password),
-                isActive = true,
+//                isActive = true,
                 isAdmin = request.isAdmin,
                 name = request.name ?: "",
-                tags = emptyList(),
+//                tags = emptyList(),
+                    role = emptyList()
             ),
         )
     }
@@ -43,9 +44,10 @@ class UsersServiceImpl(
                 UsersResponseDTO(
                     item.email,
                     item.name,
-                    item.isActive,
+//                    item.isActive,
                     item.isAdmin,
-                    item.tags,
+//                    item.tags,
+                        true
                 )
             },
             pageNo,

@@ -6,5 +6,4 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface SecretsRepository : MongoRepository<SecretsEntity, String> {
-    fun findBySearchKeyContainingIgnoreCase(searchKey: String, pageable: Pageable): Page<SecretsEntity>
 }

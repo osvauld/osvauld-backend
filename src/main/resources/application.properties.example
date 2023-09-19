@@ -1,2 +1,7 @@
 spring.data.mongodb.uri=<uri>
 spring.data.mongodb.database=secrets-manager
+
+createAdmin.token=testtoken
+
+jwt-security.secret: NLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdas
+jwt-security.expirationTime: 30

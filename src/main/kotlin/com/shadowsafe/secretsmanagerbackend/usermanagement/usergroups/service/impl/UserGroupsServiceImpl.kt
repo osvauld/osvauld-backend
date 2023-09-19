@@ -7,7 +7,10 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUse
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupsEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
+import org.springframework.stereotype.Service
 
+
+@Service
 class UserGroupsServiceImpl(
     private val userGroupsRepository: UserGroupsRepository,
 ) : UserGroupsService {

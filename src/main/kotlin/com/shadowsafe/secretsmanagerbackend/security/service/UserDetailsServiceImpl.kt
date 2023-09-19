@@ -17,7 +17,7 @@ class UserDetailsServiceImpl(private val userRepository: UsersRepository) : User
         val userEntity = userRepository.findUserByEmail(s)
         if (userEntity.isEmpty) throw UsernameNotFoundException("Username not found")
         val user = userEntity.get()
-        if (!user.isActive) throw UsernameNotFoundException("User is not active")
+//        if (!user.isActive) throw UsernameNotFoundException("User is not active")
         val authorities = ArrayList<GrantedAuthority>()
         authorities.add(SimpleGrantedAuthority(if (user.isAdmin) "Admin" else "User"))
         return User(
