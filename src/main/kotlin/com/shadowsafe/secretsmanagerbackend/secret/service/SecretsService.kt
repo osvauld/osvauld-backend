@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service
 
 @Service
 interface SecretsService {
-    fun saveSecrets(request: SaveSecretsRequestDTO) : SecretsResponseDTO
+    fun saveSecrets(request: SaveSecretsRequestDTO) : SecretsResponseDTO ;
 
 }

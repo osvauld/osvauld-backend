@@ -25,7 +25,7 @@ class SecretsController(
         return createSuccessResponse(
             "Success",
                 secretsService.saveSecrets(request),
-        )
+        );
     }
 
 }

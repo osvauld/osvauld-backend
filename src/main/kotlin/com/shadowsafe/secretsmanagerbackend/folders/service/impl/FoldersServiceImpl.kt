@@ -1,14 +1,13 @@
 package com.shadowsafe.secretsmanagerbackend.folders.service.impl
 
-import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderDTO
-import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderRequestDTO
-import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderStructureDTO
-import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderTreeDTO
+import com.shadowsafe.secretsmanagerbackend.folders.dto.*
 import com.shadowsafe.secretsmanagerbackend.folders.model.FolderEntity
 import com.shadowsafe.secretsmanagerbackend.folders.model.FolderTree
 import com.shadowsafe.secretsmanagerbackend.folders.repo.FolderTreeRepository
 import com.shadowsafe.secretsmanagerbackend.folders.repo.FoldersRepository
 import com.shadowsafe.secretsmanagerbackend.folders.service.FoldersService
+import com.shadowsafe.secretsmanagerbackend.secret.model.SecretsEntity
+import com.shadowsafe.secretsmanagerbackend.secret.repository.SecretsRepository
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import org.bson.types.ObjectId
@@ -18,22 +17,36 @@ import java.time.LocalDateTime
 @Service
 class FoldersServiceImpl(
     private val foldersRepo: FoldersRepository,
-    private val folderTreeRepo: FolderTreeRepository
+    private val folderTreeRepo: FolderTreeRepository,
+    private val secretsRepo: SecretsRepository
 ) : FoldersService {
 
-    override fun getFolder(id: String): FolderDTO {
+    override fun getFolder(id: String): FolderResponseDTO {
 
         val folder = foldersRepo.findById(id)
         if (folder.isEmpty) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         } else {
             val folderEntity = folder.get()
-            return FolderDTO(
+            val secretsList = mutableListOf<SecretsEntity>()
+
+            folderEntity.secrets.forEach { secretId ->
+                val secretEntity = secretsRepo.findById(secretId)
+                if (secretEntity != null) {
+                    secretsList.add(secretEntity.get())
+                }
+                else
+                    throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND);
+            }
+
+            val resultList: List<SecretsEntity> = secretsList.toList()
+
+            return FolderResponseDTO(
                 folderEntity._id.toHexString(),
                 folderEntity.label,
                 folderEntity.parents,
                 folderEntity.children,
-                folderEntity.secrets,
+                resultList,
                 folderEntity.createdAt,
                 folderEntity.updatedAt
             )
