@@ -11,6 +11,6 @@ data class UsersEntity(
     val email: String,
     val name: String,
     val password: String,
-    val role: List<String>,
+    val role: List<String>?,
     val isAdmin: Boolean,
 )
