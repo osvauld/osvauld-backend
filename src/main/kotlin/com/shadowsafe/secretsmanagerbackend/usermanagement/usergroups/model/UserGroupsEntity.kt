@@ -9,6 +9,8 @@ data class UserGroupsEntity(
     @Id
     val _id: ObjectId = ObjectId.get(),
     val name: String,
+    val parentIds: List<String> = emptyList(),
+    var childrenIds: List<String> = emptyList(),
     var userIds: List<String>,
     val createdBy: String
 )
