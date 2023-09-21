@@ -42,7 +42,6 @@ class SecretServiceImpl(
         foldersRepository.save(parentFolder) ;
 
         return SecretsResponseDTO(
-                id = secretsEntity._id.toHexString(),
                 name = secretsEntity.name,
                 credentials = secretsEntity.credentials,
                 parent = secretsEntity.parent.last(),
