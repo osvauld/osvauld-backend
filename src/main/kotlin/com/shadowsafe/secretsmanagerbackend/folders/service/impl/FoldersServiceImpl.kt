@@ -34,9 +34,8 @@ class FoldersServiceImpl(
                 val secretEntity = secretsRepo.findById(secretId)
                 if (secretEntity != null) {
                     secretsList.add(secretEntity.get())
-                }
-                else
-                    throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND);
+                } else
+                    throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND)
             }
 
             val resultList: List<SecretsEntity> = secretsList.toList()
@@ -53,8 +52,7 @@ class FoldersServiceImpl(
         }
     }
 
-
-    override fun saveFolders(folderRequest: FolderRequestDTO): FolderDTO {
+    override fun saveFolders(folderRequest: FolderRequestDTO): FolderStructureDTO {
 
         var folderEntity: FolderEntity
 
@@ -92,15 +90,7 @@ class FoldersServiceImpl(
             )
         }
 
-        return FolderDTO(
-            folderEntity._id.toHexString(),
-            folderEntity.label,
-            folderEntity.parents,
-            folderEntity.children,
-            folderEntity.secrets,
-            folderEntity.createdAt,
-            folderEntity.updatedAt
-        )
+        return getFolderStructure(folderEntity.parents.first())
     }
 
     override fun createNewFolderStructureForOrganisation(): FolderTreeDTO {
