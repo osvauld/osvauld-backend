@@ -11,7 +11,7 @@ data class SecretsEntity(
     @Id
     val _id : ObjectId = ObjectId.get(),
     var name : String,
-    var credentials : Map<String, String>,
+    var credentials : List<CredentialsEntity>,
     var parent : List<String>,
     var createdAt : LocalDateTime,
     var updatedAt : LocalDateTime

@@ -5,3 +5,5 @@ createAdmin.token=testtoken
 
 jwt-security.secret: NLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdasNLkajdasuabksdas
 jwt-security.expirationTime: 30
+
+field-encryption-key: f5e82a78143f7d6d98293c8cb7a7fc44
