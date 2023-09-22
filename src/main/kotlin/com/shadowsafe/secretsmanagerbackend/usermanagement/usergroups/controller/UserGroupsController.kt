@@ -37,7 +37,7 @@ class UserGroupsController(
     fun getAllGroups(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Successfully fetched user groups",
-            null
+            userGroupsService.getAllGroupFolderStructure()
         )
     }
 }
