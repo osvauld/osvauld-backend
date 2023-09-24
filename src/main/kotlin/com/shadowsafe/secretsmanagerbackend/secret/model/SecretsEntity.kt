@@ -13,6 +13,7 @@ data class SecretsEntity(
     var name : String,
     var credentials : List<CredentialsEntity>,
     var parent : List<String>,
+    var description: String,
     var createdAt : LocalDateTime,
     var updatedAt : LocalDateTime
 ) : IDTO

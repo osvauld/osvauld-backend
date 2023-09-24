@@ -8,4 +8,5 @@ data class SaveSecretsRequestDTO(
     val name: String?,
     var credentials: List<CredentialsEntity>?,
     var parent: String,
+    var description: String,
 ) : IDTO
