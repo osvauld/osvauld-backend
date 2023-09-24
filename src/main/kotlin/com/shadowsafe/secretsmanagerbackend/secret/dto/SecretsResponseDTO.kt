@@ -8,6 +8,7 @@ data class SecretsResponseDTO(
     val name: String?,
     var credentials: List<CredentialsEntity>?,
     var parent: String,
+    var description: String,
     var createdAt: LocalDateTime,
     var updatedAt: LocalDateTime
 ) : IDTO

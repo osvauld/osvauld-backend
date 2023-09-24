@@ -34,6 +34,7 @@ class SecretServiceImpl(
                             credentials = request.credentials!!,
                             parent = parentFolder.parents.plus(request.parent),
                             createdAt = LocalDateTime.now(),
+                            description = request.description,
                             updatedAt = LocalDateTime.now()
                     )
             )
@@ -45,6 +46,7 @@ class SecretServiceImpl(
                 name = secretsEntity.name,
                 credentials = secretsEntity.credentials,
                 parent = secretsEntity.parent.last(),
+                description = secretsEntity.description,
                 createdAt = secretsEntity.createdAt,
                 updatedAt = secretsEntity.updatedAt
         )
