@@ -7,6 +7,6 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GetUsersRes
 interface UsersService {
     fun createUser(request: CreateUserRequestDTO)
 
-    fun getAllUsers(pageNo: Int, pageSize: Int): GetUsersResponseDTO
+    fun getAllUsers(): GetUsersResponseDTO
     fun checkIfAdminPresent(): CheckIfAdminResponseDTO
 }

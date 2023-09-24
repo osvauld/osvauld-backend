@@ -8,8 +8,6 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEnti
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -31,29 +29,32 @@ class UsersServiceImpl(
                 isAdmin = request.isAdmin,
                 name = request.name ?: "",
 //                tags = emptyList(),
-                    role = emptyList()
+                role = emptyList(),
             ),
         )
     }
 
-    override fun getAllUsers(pageNo: Int, pageSize: Int): GetUsersResponseDTO {
-        val pageable: Pageable = PageRequest.of(pageNo, pageSize)
-        val users = usersRepository.findAll(pageable)
-        return GetUsersResponseDTO(
-            users.content.map { item ->
-                UsersResponseDTO(
-                    item.email,
-                    item.name,
-//                    item.isActive,
-                    item.isAdmin,
-//                    item.tags,
-                        true
-                )
-            },
-            pageNo,
-            pageSize,
-            users.numberOfElements,
-        )
+    override fun getAllUsers(): GetUsersResponseDTO {
+        val users = usersRepository.findAll()
+        var usersResponseDTOList = arrayListOf<UsersResponseDTO>()
+        if (users.isNotEmpty()) {
+            run {
+                users.map {
+                    usersResponseDTOList.add(
+                        UsersResponseDTO(
+                            _id = it._id.toHexString(),
+                            username = it.email,
+                            isAdmin = it.isAdmin,
+                            name = it.name,
+                            isActive = null,
+                        ),
+                    )
+                }
+            }
+        } else {
+            return GetUsersResponseDTO(users = emptyList())
+        }
+        return GetUsersResponseDTO(users = usersResponseDTOList)
     }
 
     override fun checkIfAdminPresent(): CheckIfAdminResponseDTO {

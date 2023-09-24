@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class UserGroupsController(
     private val userGroupsService: UserGroupsService,
-): AppController() {
+) : AppController() {
     @PostMapping("/groups")
     fun addUserGroup(@RequestBody request: AddUserGroupRequestDTO): ResponseEntity<ResponseDTO> {
         val userId = getCurrentAuthenticatedUserId()
@@ -37,7 +37,7 @@ class UserGroupsController(
     fun getAllGroups(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Successfully fetched user groups",
-            userGroupsService.getAllGroupFolderStructure()
+            userGroupsService.getAllGroupFolderStructure(),
         )
     }
 }
