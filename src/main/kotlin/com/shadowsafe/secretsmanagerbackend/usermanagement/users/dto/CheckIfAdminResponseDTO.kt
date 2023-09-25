@@ -4,5 +4,5 @@ import com.shadowsafe.secretsmanagerbackend.shared.IDTO
 
 data class CheckIfAdminResponseDTO(
     val token: String,
-    val isPresent: Boolean
-): IDTO
+    val isPresent: Boolean,
+) : IDTO

@@ -6,6 +6,5 @@ data class GetGroupStructureDTO(
     var id: String = "",
     var label: String = "",
     var parentId: String? = "",
-    var children: List<GetGroupStructureDTO>? = null
-): IDTO {
-}
+    var children: List<GetGroupStructureDTO>? = null,
+) : IDTO

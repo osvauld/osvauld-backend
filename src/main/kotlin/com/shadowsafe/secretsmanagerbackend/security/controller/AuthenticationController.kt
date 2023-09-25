@@ -18,5 +18,4 @@ class AuthenticationController(
     fun authenticateUser(@RequestBody loginDTO: LoginDTO): ResponseEntity<ResponseDTO> {
         return authenticationService.authenticateUser(loginDTO)
     }
-
 }

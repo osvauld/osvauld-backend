@@ -5,15 +5,18 @@ import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserGroupRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserToUserGroupRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetGroupStructureDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetUsersInGroupsResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupsEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
 @Service
 class UserGroupsServiceImpl(
     private val userGroupsRepository: UserGroupsRepository,
+    private val usersRepository: UsersRepository,
 ) : UserGroupsService {
     override fun addUserGroup(request: AddUserGroupRequestDTO, userId: String) {
         val parentIds = mutableListOf<String>()
@@ -26,7 +29,7 @@ class UserGroupsServiceImpl(
             } else {
                 throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
             }
-           val userGroup = userGroupsRepository.save(
+            val userGroup = userGroupsRepository.save(
                 UserGroupsEntity(
                     name = request.name,
                     createdBy = userId,
@@ -43,7 +46,7 @@ class UserGroupsServiceImpl(
                     name = request.name,
                     createdBy = userId,
                     userIds = emptyList(),
-                    childrenIds = emptyList()
+                    childrenIds = emptyList(),
                 ),
             )
         }
@@ -70,6 +73,16 @@ class UserGroupsServiceImpl(
         return response
     }
 
+    override fun getUsersInGroup(groupId: String): GetUsersInGroupsResponseDTO {
+        val optionalGroup = userGroupsRepository.findById(groupId)
+        if (optionalGroup.isPresent) {
+            val users = usersRepository.findAllById(optionalGroup.get().userIds)
+            return GetUsersInGroupsResponseDTO(users.toList())
+        } else {
+            throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
+        }
+    }
+
     fun getGroupFolderStructure(groupId: String, groupList: List<UserGroupsEntity>): GetGroupStructureDTO {
         val group = groupList.find { item -> item._id == ObjectId(groupId) }
 
@@ -78,7 +91,7 @@ class UserGroupsServiceImpl(
                 id = it._id.toHexString(),
                 label = it.name,
                 parentId = it.parentIds.lastOrNull(),
-                children = arrayListOf()
+                children = arrayListOf(),
             )
             it.childrenIds.forEach { item ->
                 groupStructure.children = groupStructure.children?.plus(getGroupFolderStructure(item, groupList))

@@ -33,6 +33,7 @@ class UsersController(
             null,
         )
     }
+
     @GetMapping("/public/admin-check")
     fun checkIsAdminPresent(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(

@@ -8,5 +8,5 @@ data class FolderTreeDTO(
     var organisationId: String,
     var rootFolderId: String,
     var createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
 ) : IDTO

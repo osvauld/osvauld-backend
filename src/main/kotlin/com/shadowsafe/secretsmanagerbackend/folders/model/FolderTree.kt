@@ -13,5 +13,5 @@ data class FolderTree(
     var organisationId: ObjectId = ObjectId.get(),
     var rootFolderId: String,
     var createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
 )
