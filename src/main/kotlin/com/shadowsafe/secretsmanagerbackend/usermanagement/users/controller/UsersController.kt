@@ -15,10 +15,10 @@ class UsersController(
     private val usersService: UsersService,
 ) {
     @GetMapping("/users")
-    fun getAllSecrets(@RequestParam(name = "_page") pageNo: Int, @RequestParam(name = "_limit") pageSize: Int): ResponseEntity<ResponseDTO> {
+    fun getAllSecrets(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
-            usersService.getAllUsers(pageNo, pageSize),
+            usersService.getAllUsers(),
         )
     }
 
