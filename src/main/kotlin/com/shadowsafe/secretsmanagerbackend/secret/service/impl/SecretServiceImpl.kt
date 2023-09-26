@@ -9,7 +9,6 @@ import com.shadowsafe.secretsmanagerbackend.secret.service.SecretsService
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import org.springframework.stereotype.Service
-import java.lang.Exception
 import java.time.LocalDateTime
 
 @Service
@@ -19,28 +18,28 @@ class SecretServiceImpl(
     private val foldersRepository: FoldersRepository
 ) : SecretsService {
 
-    override fun saveSecrets(request: SaveSecretsRequestDTO) : SecretsResponseDTO {
+    override fun saveSecrets(request: SaveSecretsRequestDTO): SecretsResponseDTO {
 
-        var secretsEntity : SecretsEntity ;
+        var secretsEntity: SecretsEntity
 
-        if(!foldersRepository.existsById(request.parent))
+        if (!foldersRepository.existsById(request.parent))
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
 
-        var parentFolder = foldersRepository.findById(request.parent).get();
+        var parentFolder = foldersRepository.findById(request.parent).get()
 
-            secretsEntity = secretsRepository.save(
-                    SecretsEntity(
-                            name = request.name!!,
-                            credentials = request.credentials!!,
-                            parent = parentFolder.parents.plus(request.parent),
-                            createdAt = LocalDateTime.now(),
+        secretsEntity = secretsRepository.save(
+            SecretsEntity(
+                name = request.name!!,
+                credentials = request.credentials!!,
+                parent = parentFolder.parents.plus(request.parent),
+                createdAt = LocalDateTime.now(),
                             description = request.description,
-                            updatedAt = LocalDateTime.now()
-                    )
+                updatedAt = LocalDateTime.now()
             )
+        )
 
-        parentFolder.secrets.add(secretsEntity._id.toHexString()) ;
-        foldersRepository.save(parentFolder) ;
+        parentFolder.secrets.add(secretsEntity._id.toHexString())
+        foldersRepository.save(parentFolder)
 
         return SecretsResponseDTO(
                 name = secretsEntity.name,
@@ -51,5 +50,4 @@ class SecretServiceImpl(
                 updatedAt = secretsEntity.updatedAt
         )
     }
-
 }

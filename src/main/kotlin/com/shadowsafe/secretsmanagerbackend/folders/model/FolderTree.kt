@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class FolderTree(
     @Id
     val _id: ObjectId = ObjectId.get(),
+    val type: String = "root",
     var organisationId: ObjectId = ObjectId.get(),
     var rootFolderId: String,
     var createdAt: LocalDateTime,

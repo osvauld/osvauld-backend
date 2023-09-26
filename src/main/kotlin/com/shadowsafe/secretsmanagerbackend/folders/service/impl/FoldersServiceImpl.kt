@@ -10,7 +10,6 @@ import com.shadowsafe.secretsmanagerbackend.secret.model.SecretsEntity
 import com.shadowsafe.secretsmanagerbackend.secret.repository.SecretsRepository
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
-import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -105,6 +104,7 @@ class FoldersServiceImpl(
 
         val folderTree = folderTreeRepo.save(
             FolderTree(
+                type = "root",
                 rootFolderId = folderEntity._id.toHexString(),
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
@@ -120,8 +120,9 @@ class FoldersServiceImpl(
         )
     }
 
-    override fun getFolderStructureForOrganisation(organisationId: String): FolderStructureDTO {
-        val folderTree = folderTreeRepo.findByOrganisationId(ObjectId(organisationId))
+    override fun getRootFolderAndStructure(): FolderStructureDTO {
+
+        val folderTree = folderTreeRepo.findByType("root")
         return getFolderStructure(folderTree.rootFolderId)
     }
 
