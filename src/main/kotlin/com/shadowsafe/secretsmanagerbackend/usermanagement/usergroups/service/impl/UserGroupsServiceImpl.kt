@@ -9,6 +9,7 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetUse
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupsEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.UsersResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -77,7 +78,13 @@ class UserGroupsServiceImpl(
         val optionalGroup = userGroupsRepository.findById(groupId)
         if (optionalGroup.isPresent) {
             val users = usersRepository.findAllById(optionalGroup.get().userIds)
-            return GetUsersInGroupsResponseDTO(users.toList())
+            return GetUsersInGroupsResponseDTO(users.map { item -> UsersResponseDTO(
+                _id = item._id.toHexString(),
+                username = item.email,
+                isActive = true,
+                isAdmin = item.isAdmin,
+                name = item.name
+            ) })
         } else {
             throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
         }
