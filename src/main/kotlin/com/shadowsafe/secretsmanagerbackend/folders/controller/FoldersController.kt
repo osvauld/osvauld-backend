@@ -40,11 +40,11 @@ class FoldersController(
         )
     }
 
-    @GetMapping("/folders/structure/{organisationId}")
-    fun getFolderStructure(@PathVariable(name = "organisationId") organisationId: String): ResponseEntity<ResponseDTO> {
+    @GetMapping("/folders/structure")
+    fun getFolderStructure(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
-            foldersService.getFolderStructureForOrganisation(organisationId)
+            foldersService.getRootFolderAndStructure()
         )
     }
 }

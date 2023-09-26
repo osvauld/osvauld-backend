@@ -1,17 +1,12 @@
 package com.shadowsafe.secretsmanagerbackend.secret.controller
 
 import com.shadowsafe.secretsmanagerbackend.secret.dto.SaveSecretsRequestDTO
-import com.shadowsafe.secretsmanagerbackend.secret.dto.SecretsResponseDTO
 import com.shadowsafe.secretsmanagerbackend.secret.service.SecretsService
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -24,8 +19,7 @@ class SecretsController(
 
         return createSuccessResponse(
             "Success",
-                secretsService.saveSecrets(request),
-        );
+            secretsService.saveSecrets(request),
+        )
     }
-
 }
