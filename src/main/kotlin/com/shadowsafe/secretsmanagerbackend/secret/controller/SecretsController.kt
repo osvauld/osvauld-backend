@@ -16,7 +16,6 @@ class SecretsController(
 
     @PostMapping("/secrets")
     fun saveSecrets(@RequestBody request: SaveSecretsRequestDTO): ResponseEntity<ResponseDTO> {
-
         return createSuccessResponse(
             "Success",
             secretsService.saveSecrets(request),

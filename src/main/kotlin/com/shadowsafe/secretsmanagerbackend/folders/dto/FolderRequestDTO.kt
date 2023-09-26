@@ -7,5 +7,5 @@ data class FolderRequestDTO(
     val label: String?,
     val parent: String?,
     val children: List<String>?,
-    val secrets: List<String>?
+    val secrets: List<String>?,
 ) : IDTO

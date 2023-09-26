@@ -14,5 +14,5 @@ data class FolderEntity(
     var children: ArrayList<String>,
     var secrets: ArrayList<String>,
     var createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime,
 )

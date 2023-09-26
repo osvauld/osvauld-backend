@@ -7,10 +7,7 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUse
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserToUserGroupRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class UserGroupsController(
@@ -38,6 +35,14 @@ class UserGroupsController(
         return createSuccessResponse(
             "Successfully fetched user groups",
             userGroupsService.getAllGroupFolderStructure(),
+        )
+    }
+
+    @GetMapping("/groups/user/{id}")
+    fun getUsersOfUserGroup(@PathVariable id: String): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Successfully fetched users",
+            userGroupsService.getUsersInGroup(id),
         )
     }
 }

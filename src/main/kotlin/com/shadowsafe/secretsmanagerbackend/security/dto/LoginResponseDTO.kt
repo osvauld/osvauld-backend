@@ -7,5 +7,5 @@ data class LoginResponseDTO(
     var name: String,
     var email: String,
     var role: String,
-    val token: String
+    val token: String,
 ) : IDTO

@@ -12,5 +12,5 @@ data class UserGroupsEntity(
     val parentIds: List<String> = emptyList(),
     var childrenIds: List<String> = emptyList(),
     var userIds: List<String>,
-    val createdBy: String
+    val createdBy: String,
 )

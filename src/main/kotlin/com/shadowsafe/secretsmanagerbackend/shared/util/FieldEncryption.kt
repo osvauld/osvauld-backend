@@ -1,12 +1,12 @@
 package com.shadowsafe.secretsmanagerbackend.shared.util
-//import javax.crypto.Cipher
-//import javax.crypto.SecretKey
-//import javax.crypto.spec.GCMParameterSpec
-//import javax.crypto.spec.SecretKeySpec
-//import java.security.SecureRandom
-//import java.util.Base64
+// import javax.crypto.Cipher
+// import javax.crypto.SecretKey
+// import javax.crypto.spec.GCMParameterSpec
+// import javax.crypto.spec.SecretKeySpec
+// import java.security.SecureRandom
+// import java.util.Base64
 //
-//object FieldEncryption {
+// object FieldEncryption {
 //    fun encrypt(plaintext: String, encryptionKey: String): String {
 //        val iv = ByteArray(12)
 //        SecureRandom().nextBytes(iv)
@@ -46,5 +46,5 @@ package com.shadowsafe.secretsmanagerbackend.shared.util
 //
 //        return String(decryptedBytes, Charsets.UTF_8)
 //    }
-//}
+// }
 //

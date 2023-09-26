@@ -10,5 +10,5 @@ data class SecretsResponseDTO(
     var parent: String,
     var description: String,
     var createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime,
 ) : IDTO

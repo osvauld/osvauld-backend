@@ -1,6 +1,5 @@
 package com.shadowsafe.secretsmanagerbackend.folders.dto
 
-import com.shadowsafe.secretsmanagerbackend.secret.model.SecretsEntity
 import com.shadowsafe.secretsmanagerbackend.shared.IDTO
 import java.time.LocalDateTime
 
@@ -11,5 +10,5 @@ data class FolderDTO(
     var children: List<String>?,
     var secrets: List<String>?,
     var createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime,
 ) : IDTO
