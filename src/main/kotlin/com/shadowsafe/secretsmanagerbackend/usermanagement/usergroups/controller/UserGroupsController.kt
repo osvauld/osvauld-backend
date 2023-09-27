@@ -45,4 +45,13 @@ class UserGroupsController(
             userGroupsService.getUsersInGroup(id),
         )
     }
+
+    @DeleteMapping("/groups/{groupId}/user/{userId}")
+    fun removeUserFromGroup(@PathVariable groupId: String, @PathVariable userId: String): ResponseEntity<ResponseDTO> {
+        userGroupsService.removeUserFromGroup(userId, groupId)
+        return createSuccessResponse(
+            "Succesfully deleted user from group",
+            null
+        )
+    }
 }

@@ -13,4 +13,5 @@ interface UserGroupsService {
     fun getAllGroupFolderStructure(): GetGroupStructureDTO
 
     fun getUsersInGroup(groupId: String): GetUsersInGroupsResponseDTO
+    fun removeUserFromGroup(userId: String, groupId: String)
 }
