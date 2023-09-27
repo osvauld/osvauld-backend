@@ -1,9 +1,9 @@
 package com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.impl
 
-import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CheckIfAdminResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CreateUserRequestDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GetUsersResponseDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.UsersResponseDTO
+import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
+import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.*
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 class UsersServiceImpl(
     private val usersRepository: UsersRepository,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val userGroupsRepository: UserGroupsRepository,
 ) : UsersService {
 
     @Value("\${createAdmin.token}")
@@ -25,10 +26,8 @@ class UsersServiceImpl(
             UsersEntity(
                 email = request.username,
                 password = bCryptPasswordEncoder.encode(request.password),
-//                isActive = true,
                 isAdmin = request.isAdmin,
                 name = request.name ?: "",
-//                tags = emptyList(),
                 role = emptyList(),
             ),
         )
@@ -70,5 +69,18 @@ class UsersServiceImpl(
                 isPresent = true,
             )
         }
+    }
+
+    override fun getGroupsOfUser(userId: String): GetGroupsOfUserResponseDTO {
+        val user = usersRepository.findById(userId)
+        if (user.isEmpty) throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+        val userGroups = userGroupsRepository.getGroupsOfUser(listOf(userId))
+        if (userGroups.isNullOrEmpty()) return GetGroupsOfUserResponseDTO(user.get().name, user.get().email)
+        return GetGroupsOfUserResponseDTO(
+            user.get().name,
+            user.get().email,
+            "",
+            userGroups.map { item -> GroupResponseDTO(item._id.toHexString(), item.name) },
+        )
     }
 }

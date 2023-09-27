@@ -30,15 +30,15 @@ class UserGroupsServiceImpl(
             } else {
                 throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
             }
+            val groupParent = groupParentOptional.get()
             val userGroup = userGroupsRepository.save(
                 UserGroupsEntity(
                     name = request.name,
                     createdBy = userId,
-                    userIds = emptyList(),
+                    userIds = groupParent.childrenIds,
                     parentIds = parentIds,
                 ),
             )
-            val groupParent = groupParentOptional.get()
             groupParent.childrenIds = groupParent.childrenIds + userGroup._id.toHexString()
             userGroupsRepository.save(groupParent)
         } else {
@@ -55,8 +55,11 @@ class UserGroupsServiceImpl(
 
     override fun addUserToUserGroup(request: AddUserToUserGroupRequestDTO, userId: String) {
         val optionalGroup = userGroupsRepository.findById(request.groupId)
+
         if (optionalGroup.isPresent) {
             val group = optionalGroup.get()
+
+            if (group.userIds.containsAll(request.userIds)) throw GenericException(GenericErrorCodes.USER_ALREADY_EXISTS)
             group.userIds = group.userIds + request.userIds
             userGroupsRepository.save(group)
         } else {

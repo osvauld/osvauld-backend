@@ -38,7 +38,7 @@ class AuthenticationService(
             val authClaims = listOf(if (user.isAdmin) "Admin" else "User")
 
             val token = Jwts.builder()
-                .setSubject(user.email)
+                .setSubject(user._id.toHexString())
                 .claim("auth", authClaims)
                 .setExpiration(
                     Date(Date().time + 60 * 60 * 60 * 24 * securityProperties.expirationTime * 1000),
