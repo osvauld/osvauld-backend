@@ -1,5 +1,6 @@
 package com.shadowsafe.secretsmanagerbackend.usermanagement.users.controller
 
+import com.shadowsafe.secretsmanagerbackend.shared.aop.AppController
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 class UsersController(
     private val usersService: UsersService,
-) {
+) : AppController() {
     @GetMapping("/users")
     fun getAllSecrets(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
@@ -39,6 +40,15 @@ class UsersController(
         return createSuccessResponse(
             "Success",
             usersService.checkIfAdminPresent(),
+        )
+    }
+
+    @GetMapping("/users/group")
+    fun getAllGroupsOfUser(@RequestParam id: String?): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
+        return createSuccessResponse(
+            "Successfully fetched groups of user",
+            usersService.getGroupsOfUser(id ?: userId),
         )
     }
 }
