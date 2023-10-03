@@ -13,7 +13,7 @@ class SecretsController(
 ) {
     @GetMapping("/secrets/health")
     fun healthCheck(): String {
-        return "OK" ;
+        return "OK"
     }
 
     @PostMapping("/secrets")
@@ -24,19 +24,19 @@ class SecretsController(
         )
     }
 
-    @GetMapping("/secrets/url/")
-    fun getSecretsByUrl(@RequestParam request: String): ResponseEntity<ResponseDTO> {
+    @GetMapping("/secrets")
+    fun getSecretsByUrl(@RequestParam url: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
-                "Success",
-                secretsService.getSecretsByUrl(request)
+            "Success",
+            secretsService.getSecretsByUrl(url)
         )
     }
 
-//    @GetMapping("/secrets/url/")
-//    fun getAllUrls(): ResponseEntity<ResponseDTO> {
-//        return createSuccessResponse(
-//                "Success",
-//                secretsService.getAllUrls(),
-//        )
-//    }
+    @GetMapping("/secrets/urls")
+    fun getAllUrls(): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+            "Success",
+            secretsService.getAllUrls(),
+        )
+    }
 }
