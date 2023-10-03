@@ -9,11 +9,12 @@ import java.time.LocalDateTime
 @Document("secrets")
 data class SecretsEntity(
     @Id
-    val _id : ObjectId = ObjectId.get(),
-    var name : String,
-    var credentials : List<CredentialsEntity>,
-    var parent : List<String>,
+    val _id: ObjectId = ObjectId.get(),
+    var name: String?,
+    var credentials: List<CredentialsEntity>,
+    var parent: List<String>,
     var description: String,
-    var createdAt : LocalDateTime,
-    var updatedAt : LocalDateTime
+    var type: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime
 ) : IDTO
