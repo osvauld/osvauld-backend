@@ -2,6 +2,7 @@ package com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.impl
 
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.*
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
@@ -16,6 +17,7 @@ class UsersServiceImpl(
     private val usersRepository: UsersRepository,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
     private val userGroupsRepository: UserGroupsRepository,
+    private val groupAccessRepository: GroupAccessRepository,
 ) : UsersService {
 
     @Value("\${createAdmin.token}")
@@ -72,15 +74,28 @@ class UsersServiceImpl(
     }
 
     override fun getGroupsOfUser(userId: String): GetGroupsOfUserResponseDTO {
+        val user = getUserById(userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+        val response = GetGroupsOfUserResponseDTO(
+            name = user.name,
+            username = user.email,
+            "",
+        )
+        val accessList = groupAccessRepository.findAccessContainingUser(userId)
+        return if (accessList.isEmpty()) {
+            response
+        } else {
+            response.groups = accessList.map { item -> GroupResponseDTO(item.groupId, item.name) }
+            response
+        }
+    }
+
+    override fun checkIfUserPresent(userId: String): Boolean {
+        return usersRepository.findById(userId).isPresent
+    }
+
+    override fun getUserById(userId: String): UsersEntity? {
         val user = usersRepository.findById(userId)
         if (user.isEmpty) throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
-        val userGroups = userGroupsRepository.getGroupsOfUser(listOf(userId))
-        if (userGroups.isNullOrEmpty()) return GetGroupsOfUserResponseDTO(user.get().name, user.get().email)
-        return GetGroupsOfUserResponseDTO(
-            user.get().name,
-            user.get().email,
-            "",
-            userGroups.map { item -> GroupResponseDTO(item._id.toHexString(), item.name) },
-        )
+        return user.get()
     }
 }

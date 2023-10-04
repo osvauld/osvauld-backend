@@ -39,6 +39,7 @@ class WebConfig(
             .antMatchers(HttpMethod.POST, "/authenticate").permitAll()
             .antMatchers(HttpMethod.POST, "/public/users").permitAll()
             .antMatchers(HttpMethod.GET, "/public/admin-check").permitAll()
+            .antMatchers(HttpMethod.GET, "/ping").permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
