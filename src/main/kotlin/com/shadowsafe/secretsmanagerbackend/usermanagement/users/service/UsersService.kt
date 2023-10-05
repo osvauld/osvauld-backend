@@ -4,6 +4,7 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CheckIfAdmi
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.CreateUserRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GetGroupsOfUserResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GetUsersResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
 
 interface UsersService {
     fun createUser(request: CreateUserRequestDTO)
@@ -12,4 +13,7 @@ interface UsersService {
     fun checkIfAdminPresent(): CheckIfAdminResponseDTO
 
     fun getGroupsOfUser(userId: String): GetGroupsOfUserResponseDTO
+    fun checkIfUserPresent(userId: String): Boolean
+
+    fun getUserById(userId: String): UsersEntity?
 }

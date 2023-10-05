@@ -6,5 +6,5 @@ data class GetGroupsOfUserResponseDTO(
     val name: String,
     val username: String,
     val createdBy: String? = "",
-    val groups: List<GroupResponseDTO>? = emptyList(),
+    var groups: List<GroupResponseDTO>? = emptyList(),
 ) : IDTO

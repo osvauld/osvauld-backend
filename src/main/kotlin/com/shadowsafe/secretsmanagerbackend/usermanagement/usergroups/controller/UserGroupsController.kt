@@ -30,14 +30,6 @@ class UserGroupsController(
         )
     }
 
-    @GetMapping("/groups")
-    fun getAllGroups(): ResponseEntity<ResponseDTO> {
-        return createSuccessResponse(
-            "Successfully fetched user groups",
-            userGroupsService.getAllGroupFolderStructure(),
-        )
-    }
-
     @GetMapping("/groups/user/{id}")
     fun getUsersOfUserGroup(@PathVariable id: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(

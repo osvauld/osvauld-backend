@@ -2,15 +2,16 @@ package com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.i
 
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
-import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserGroupRequestDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserToUserGroupRequestDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetGroupStructureDTO
-import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetUsersInGroupsResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.*
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.enums.GroupAccessType
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.GroupAccessEntity
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupAccessEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupsEntity
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
-import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.UsersResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
@@ -18,39 +19,24 @@ import org.springframework.stereotype.Service
 class UserGroupsServiceImpl(
     private val userGroupsRepository: UserGroupsRepository,
     private val usersRepository: UsersRepository,
+    private val usersService: UsersService,
+    private val groupAccessRepository: GroupAccessRepository,
 ) : UserGroupsService {
     override fun addUserGroup(request: AddUserGroupRequestDTO, userId: String) {
-        val parentIds = mutableListOf<String>()
-        if (!request.parentId.isNullOrEmpty()) {
-            val groupParentOptional = userGroupsRepository.findById(request.parentId)
-            if (groupParentOptional.isPresent) {
-                val groupParent = groupParentOptional.get()
-                parentIds.addAll(groupParent.parentIds)
-                parentIds.add(request.parentId)
-            } else {
-                throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
-            }
-            val groupParent = groupParentOptional.get()
-            val userGroup = userGroupsRepository.save(
-                UserGroupsEntity(
-                    name = request.name,
-                    createdBy = userId,
-                    userIds = groupParent.childrenIds,
-                    parentIds = parentIds,
-                ),
-            )
-            groupParent.childrenIds = groupParent.childrenIds + userGroup._id.toHexString()
-            userGroupsRepository.save(groupParent)
-        } else {
-            userGroupsRepository.save(
-                UserGroupsEntity(
-                    name = request.name,
-                    createdBy = userId,
-                    userIds = emptyList(),
-                    childrenIds = emptyList(),
-                ),
-            )
+        val userGroupsEntity = UserGroupsEntity(_id = ObjectId.get(), name = request.name, createdBy = userId)
+        request.userAccess?.forEach { item ->
+            if (!usersService.checkIfUserPresent(item.userId)) throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
         }
+        request.userAccess = request.userAccess?.plus(UserGroupAccessEntity(userId, GroupAccessType.OWNER))
+        var groupAccess = groupAccessRepository.save(
+            GroupAccessEntity(
+                groupId = userGroupsEntity._id.toHexString(),
+                name = request.name,
+                accessList = request.userAccess ?: emptyList(),
+            ),
+        )
+        userGroupsEntity.accessListId = groupAccess._id.toHexString()
+        userGroupsRepository.save(userGroupsEntity)
     }
 
     override fun addUserToUserGroup(request: AddUserToUserGroupRequestDTO, userId: String) {
@@ -58,10 +44,12 @@ class UserGroupsServiceImpl(
 
         if (optionalGroup.isPresent) {
             val group = optionalGroup.get()
-
-            if (group.userIds.containsAll(request.userIds)) throw GenericException(GenericErrorCodes.USER_ALREADY_EXISTS)
-            group.userIds = group.userIds + request.userIds
-            userGroupsRepository.save(group)
+            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
+            request.userAccessList.forEach { item ->
+                if (groupAccess.accessList.any { access -> access.userId == item.userId }) throw GenericException(GenericErrorCodes.USER_ALREADY_EXISTS)
+                groupAccess.accessList = groupAccess.accessList.plus(UserGroupAccessEntity(item.userId, item.accessType))
+            }
+            groupAccessRepository.save(groupAccess)
         } else {
             throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
         }
@@ -69,59 +57,33 @@ class UserGroupsServiceImpl(
 
     override fun removeUserFromGroup(userId: String, groupId: String) {
         val optionalGroup = userGroupsRepository.findById(groupId)
+
         if (optionalGroup.isPresent) {
-            var group = optionalGroup.get()
-            group.userIds = group.userIds.minus(userId)
-            userGroupsRepository.save(group)
+            val group = optionalGroup.get()
+            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
+            groupAccess.accessList = groupAccess.accessList.filter { item -> item.userId != userId }
+            groupAccessRepository.save(groupAccess)
         } else {
             throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
         }
-    }
-
-    override fun getAllGroupFolderStructure(): GetGroupStructureDTO {
-        var response = GetGroupStructureDTO()
-        val allGroups = userGroupsRepository.findAll()
-        if (allGroups.isNotEmpty()) {
-            val rootGroup = allGroups.find { item -> item.parentIds.isNullOrEmpty() }
-            response = getGroupFolderStructure(rootGroup!!._id.toHexString(), allGroups)
-        }
-        return response
     }
 
     override fun getUsersInGroup(groupId: String): GetUsersInGroupsResponseDTO {
         val optionalGroup = userGroupsRepository.findById(groupId)
         if (optionalGroup.isPresent) {
-            val users = usersRepository.findAllById(optionalGroup.get().userIds)
+            val group = optionalGroup.get()
+            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
             return GetUsersInGroupsResponseDTO(
-                users.map { item ->
-                    UsersResponseDTO(
-                        _id = item._id.toHexString(),
-                        username = item.email,
-                        isActive = true,
-                        isAdmin = item.isAdmin,
-                        name = item.name
+                users = groupAccess.accessList.map { item ->
+                    UserInGroupDTO(
+                        userId = item.userId,
+                        name = usersService.getUserById(item.userId)!!.name,
+                        accessType = item.accessType.name,
                     )
-                }
+                },
             )
         } else {
             throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
-        }
-    }
-
-    fun getGroupFolderStructure(groupId: String, groupList: List<UserGroupsEntity>): GetGroupStructureDTO {
-        val group = groupList.find { item -> item._id == ObjectId(groupId) }
-
-        group!!.let {
-            val groupStructure = GetGroupStructureDTO(
-                id = it._id.toHexString(),
-                label = it.name,
-                parentId = it.parentIds.lastOrNull(),
-                children = arrayListOf(),
-            )
-            it.childrenIds.forEach { item ->
-                groupStructure.children = groupStructure.children?.plus(getGroupFolderStructure(item, groupList))
-            }
-            return groupStructure
         }
     }
 }
