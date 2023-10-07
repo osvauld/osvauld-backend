@@ -1,5 +1,6 @@
 package com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.impl
 
+import com.shadowsafe.secretsmanagerbackend.accessmanagement.model.GroupFolderAccessEntity
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.*
@@ -13,6 +14,7 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.Us
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.bson.types.ObjectId
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -35,7 +37,7 @@ class UserGroupsServiceImpl(
                 accessList = request.userAccess ?: emptyList(),
             ),
         )
-        userGroupsEntity.accessListId = groupAccess._id.toHexString()
+        userGroupsEntity.userAccessListId = groupAccess._id.toHexString()
         userGroupsRepository.save(userGroupsEntity)
     }
 
@@ -44,7 +46,7 @@ class UserGroupsServiceImpl(
 
         if (optionalGroup.isPresent) {
             val group = optionalGroup.get()
-            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
+            val groupAccess = groupAccessRepository.findById(group.userAccessListId!!).get()
             request.userAccessList.forEach { item ->
                 if (groupAccess.accessList.any { access -> access.userId == item.userId }) throw GenericException(GenericErrorCodes.USER_ALREADY_EXISTS)
                 groupAccess.accessList = groupAccess.accessList.plus(UserGroupAccessEntity(item.userId, item.accessType))
@@ -60,7 +62,7 @@ class UserGroupsServiceImpl(
 
         if (optionalGroup.isPresent) {
             val group = optionalGroup.get()
-            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
+            val groupAccess = groupAccessRepository.findById(group.userAccessListId!!).get()
             groupAccess.accessList = groupAccess.accessList.filter { item -> item.userId != userId }
             groupAccessRepository.save(groupAccess)
         } else {
@@ -72,7 +74,7 @@ class UserGroupsServiceImpl(
         val optionalGroup = userGroupsRepository.findById(groupId)
         if (optionalGroup.isPresent) {
             val group = optionalGroup.get()
-            val groupAccess = groupAccessRepository.findById(group.accessListId!!).get()
+            val groupAccess = groupAccessRepository.findById(group.userAccessListId!!).get()
             return GetUsersInGroupsResponseDTO(
                 users = groupAccess.accessList.map { item ->
                     UserInGroupDTO(
@@ -85,5 +87,11 @@ class UserGroupsServiceImpl(
         } else {
             throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
         }
+    }
+
+    override fun addFolderAccess(groupId: String, access: GroupFolderAccessEntity) {
+        val group = userGroupsRepository.findByIdOrNull(groupId) ?: throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
+        group.folderAccessList = if (group.folderAccessList.isNullOrEmpty()) listOf(access) else group.folderAccessList!!.plus(access)
+        userGroupsRepository.save(group)
     }
 }

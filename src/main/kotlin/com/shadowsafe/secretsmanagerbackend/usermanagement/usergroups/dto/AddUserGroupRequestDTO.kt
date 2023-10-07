@@ -4,5 +4,5 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.User
 
 data class AddUserGroupRequestDTO(
     val name: String,
-    var userAccess: List<UserGroupAccessEntity>? = emptyList()
+    var userAccess: List<UserGroupAccessEntity>? = emptyList(),
 )

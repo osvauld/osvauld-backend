@@ -43,7 +43,7 @@ class UserGroupsController(
         userGroupsService.removeUserFromGroup(userId, groupId)
         return createSuccessResponse(
             "Succesfully deleted user from group",
-            null
+            null,
         )
     }
 }

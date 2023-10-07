@@ -20,14 +20,14 @@ class SecretServiceImpl(
 
     private val secretsRepository: SecretsRepository,
     private val foldersRepository: FoldersRepository,
-    private val urlSecretMappingRepository: UrlSecretMappingRepository
+    private val urlSecretMappingRepository: UrlSecretMappingRepository,
 
 ) : SecretsService {
 
     override fun saveSecrets(request: SaveSecretsRequestDTO): SecretsResponseDTO {
-
-        if (!foldersRepository.existsById(request.parent))
+        if (!foldersRepository.existsById(request.parent)) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
+        }
 
         val parentFolder = foldersRepository.findById(request.parent).get()
         var secretKeysList = arrayListOf<String>()
@@ -39,8 +39,11 @@ class SecretServiceImpl(
             if (cred.fieldKey.lowercase() == "url") urlVal = cred.fieldValue
         }
 
-        val secretType = if (secretKeysList.containsAll(autofillKeyValues)) SECRET_TYPE_AUTOFILL
-        else SECRET_TYPE_OTHERS
+        val secretType = if (secretKeysList.containsAll(autofillKeyValues)) {
+            SECRET_TYPE_AUTOFILL
+        } else {
+            SECRET_TYPE_OTHERS
+        }
 
         val secretsEntity = secretsRepository.save(
             SecretsEntity(
@@ -50,8 +53,8 @@ class SecretServiceImpl(
                 createdAt = LocalDateTime.now(),
                 description = request.description,
                 updatedAt = LocalDateTime.now(),
-                type = secretType
-            )
+                type = secretType,
+            ),
         )
 
         if (secretType == SECRET_TYPE_AUTOFILL) {
@@ -59,8 +62,8 @@ class SecretServiceImpl(
                 urlSecretMappingRepository.save(
                     UrlSecretMappingEntity(
                         secretIds = listOf(secretsEntity._id.toHexString()),
-                        url = urlVal
-                    )
+                        url = urlVal,
+                    ),
                 )
             } else {
                 val urlEntity = urlSecretMappingRepository.findByUrl(urlVal).get()
@@ -69,7 +72,7 @@ class SecretServiceImpl(
             }
         }
 
-        parentFolder.secrets.add(secretsEntity._id.toHexString())
+        parentFolder.secrets.plus(secretsEntity._id.toHexString())
         foldersRepository.save(parentFolder)
 
         return SecretsResponseDTO(
@@ -78,12 +81,11 @@ class SecretServiceImpl(
             parent = secretsEntity.parent.last(),
             description = secretsEntity.description,
             createdAt = secretsEntity.createdAt,
-            updatedAt = secretsEntity.updatedAt
+            updatedAt = secretsEntity.updatedAt,
         )
     }
 
     override fun getSecretsByUrl(request: String): SecretByUrlResponseDTOList {
-
         val secretsByUrlResponseDTO = SecretByUrlResponseDTOList()
         val urlEntity = urlSecretMappingRepository.findByUrl(request).get()
 
@@ -94,7 +96,7 @@ class SecretServiceImpl(
             var secretByUrlResponseDTO = SecretByUrlResponseDTO(
                 username = secret.credentials.single {
                     it.fieldKey.lowercase() == "username"
-                }.fieldValue
+                }.fieldValue,
 
             )
             secretsByUrlResponseDTO.secrets += secretByUrlResponseDTO
@@ -109,7 +111,7 @@ class SecretServiceImpl(
             it.url
         }
         return URLsListDTO(
-            urls = urls
+            urls = urls,
         )
     }
 }

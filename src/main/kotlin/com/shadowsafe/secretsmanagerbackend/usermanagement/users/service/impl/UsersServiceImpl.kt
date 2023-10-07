@@ -1,14 +1,18 @@
 package com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.impl
 
+import com.shadowsafe.secretsmanagerbackend.accessmanagement.model.UserFolderAccessEntity
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.*
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UserFolderAccessManagementEntity
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.model.UsersEntity
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UserFolderAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UsersRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -18,6 +22,7 @@ class UsersServiceImpl(
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
     private val userGroupsRepository: UserGroupsRepository,
     private val groupAccessRepository: GroupAccessRepository,
+    private val userFolderAccessRepository: UserFolderAccessRepository,
 ) : UsersService {
 
     @Value("\${createAdmin.token}")
@@ -81,11 +86,15 @@ class UsersServiceImpl(
             "",
         )
         val accessList = groupAccessRepository.findAccessContainingUser(userId)
-        return if (accessList.isEmpty()) {
-            response
+        if (accessList != null) {
+            return if (accessList.isEmpty()) {
+                response
+            } else {
+                response.groups = accessList.map { item -> GroupResponseDTO(item.groupId, item.name) }
+                response
+            }
         } else {
-            response.groups = accessList.map { item -> GroupResponseDTO(item.groupId, item.name) }
-            response
+            throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
         }
     }
 
@@ -97,5 +106,21 @@ class UsersServiceImpl(
         val user = usersRepository.findById(userId)
         if (user.isEmpty) throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
         return user.get()
+    }
+
+    override fun addFolderToUser(userId: String, folderAccessEntity: UserFolderAccessEntity) {
+        usersRepository.findByIdOrNull(userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+        val userFolderAccess = userFolderAccessRepository.findByUserId(userId)
+        if (userFolderAccess == null) {
+            userFolderAccessRepository.save(
+                UserFolderAccessManagementEntity(
+                    userId = userId,
+                    folderAccess = listOf(folderAccessEntity),
+                ),
+            )
+        } else {
+            userFolderAccess.folderAccess = userFolderAccess.folderAccess.plus(folderAccessEntity)
+            userFolderAccessRepository.save(userFolderAccess)
+        }
     }
 }

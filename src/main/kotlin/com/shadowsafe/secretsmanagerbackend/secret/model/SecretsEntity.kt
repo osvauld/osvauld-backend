@@ -16,5 +16,5 @@ data class SecretsEntity(
     var description: String,
     var type: String,
     var createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime,
 ) : IDTO

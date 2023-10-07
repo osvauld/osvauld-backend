@@ -2,6 +2,7 @@ package com.shadowsafe.secretsmanagerbackend.folders.controller
 
 import com.shadowsafe.secretsmanagerbackend.folders.dto.FolderRequestDTO
 import com.shadowsafe.secretsmanagerbackend.folders.service.FoldersService
+import com.shadowsafe.secretsmanagerbackend.shared.aop.AppController
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
 import org.springframework.http.ResponseEntity
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class FoldersController(
     private val foldersService: FoldersService,
-) {
+) : AppController() {
 
     @GetMapping("/folders/{id}")
     fun getFolderDetails(@PathVariable(name = "id") id: String): ResponseEntity<ResponseDTO> {
@@ -26,9 +27,10 @@ class FoldersController(
 
     @PostMapping("/folders")
     fun saveFolder(@RequestBody request: FolderRequestDTO): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
             "Success",
-            foldersService.saveFolders(request),
+            foldersService.saveFolders(request, userId),
         )
     }
 
@@ -36,15 +38,16 @@ class FoldersController(
     fun createNewFolderStructureForOrganisation(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
-            foldersService.createNewFolderStructureForOrganisation()
+            foldersService.createNewFolderStructureForOrganisation(),
         )
     }
 
     @GetMapping("/folders/structure")
     fun getFolderStructure(): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
             "Success",
-            foldersService.getRootFolderAndStructure()
+            foldersService.getFolderOfUser(userId),
         )
     }
 }

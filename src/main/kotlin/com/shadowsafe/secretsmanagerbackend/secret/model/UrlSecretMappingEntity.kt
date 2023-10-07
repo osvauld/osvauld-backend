@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document("url-secret")
 data class UrlSecretMappingEntity(
-        @Id
-        val _id : ObjectId = ObjectId.get(),
-        var secretIds : List<String>,
-        val url : String
+    @Id
+    val _id: ObjectId = ObjectId.get(),
+    var secretIds: List<String>,
+    val url: String,
 ) : IDTO

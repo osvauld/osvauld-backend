@@ -4,5 +4,5 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.enums.Grou
 
 data class UserGroupAccessEntity(
     val userId: String,
-    val accessType: GroupAccessType
+    val accessType: GroupAccessType,
 )
