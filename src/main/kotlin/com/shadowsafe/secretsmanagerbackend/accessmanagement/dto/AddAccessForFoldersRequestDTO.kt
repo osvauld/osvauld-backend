@@ -6,5 +6,5 @@ import com.shadowsafe.secretsmanagerbackend.accessmanagement.model.SecretUserAcc
 data class AddAccessForFoldersRequestDTO(
     val folderId: String,
     val userAccess: List<SecretUserAccessEntity>? = emptyList(),
-    val groupAccess: List<SecretGroupAccessEntity>? = emptyList(),
+    val groupAccess: List<FolderGroupAccessDTO>? = emptyList(),
 )
