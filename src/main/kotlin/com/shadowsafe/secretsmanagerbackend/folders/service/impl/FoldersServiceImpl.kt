@@ -1,5 +1,7 @@
 package com.shadowsafe.secretsmanagerbackend.folders.service.impl
 
+import com.shadowsafe.secretsmanagerbackend.accessmanagement.enums.SecretUserAccessType
+import com.shadowsafe.secretsmanagerbackend.accessmanagement.model.UserFolderAccessEntity
 import com.shadowsafe.secretsmanagerbackend.folders.dto.*
 import com.shadowsafe.secretsmanagerbackend.folders.model.FolderEntity
 import com.shadowsafe.secretsmanagerbackend.folders.model.FolderTree
@@ -10,6 +12,11 @@ import com.shadowsafe.secretsmanagerbackend.secret.model.SecretsEntity
 import com.shadowsafe.secretsmanagerbackend.secret.repository.SecretsRepository
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UserFolderAccessRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -18,6 +25,10 @@ class FoldersServiceImpl(
     private val foldersRepo: FoldersRepository,
     private val folderTreeRepo: FolderTreeRepository,
     private val secretsRepo: SecretsRepository,
+    private val groupAccessRepository: GroupAccessRepository,
+    private val userGroupsRepository: UserGroupsRepository,
+    private val userFolderAccessRepository: UserFolderAccessRepository,
+    private val usersService: UsersService,
 ) : FoldersService {
 
     override fun getFolder(id: String): FolderResponseDTO {
@@ -51,7 +62,7 @@ class FoldersServiceImpl(
         }
     }
 
-    override fun saveFolders(folderRequest: FolderRequestDTO): FolderStructureDTO {
+    override fun saveFolders(folderRequest: FolderRequestDTO, userId: String): FolderStructureDTO {
         var folderEntity: FolderEntity
 
         if (!folderRequest.parent.isNullOrEmpty()) {
@@ -60,7 +71,6 @@ class FoldersServiceImpl(
             var parentsList: ArrayList<String> = arrayListOf()
             parentsList += parent.parents!!
             parentsList += parent._id.toHexString()
-
             folderEntity = foldersRepo.save(
                 FolderEntity(
                     label = folderRequest.label!!,
@@ -69,6 +79,8 @@ class FoldersServiceImpl(
                     secrets = arrayListOf<String>(),
                     createdAt = LocalDateTime.now(),
                     updatedAt = LocalDateTime.now(),
+                    groupAccessList = parent.groupAccessList,
+                    userAccessList = parent.userAccessList,
                 ),
             )
 
@@ -86,7 +98,13 @@ class FoldersServiceImpl(
                 ),
             )
         }
-
+        usersService.addFolderToUser(
+            userId,
+            UserFolderAccessEntity(
+                folderId = folderEntity._id.toHexString(),
+                SecretUserAccessType.OWNER,
+            ),
+        )
         return getFolderStructure(folderEntity.parents.first())
     }
 
@@ -120,10 +138,29 @@ class FoldersServiceImpl(
         )
     }
 
-    override fun getRootFolderAndStructure(): FolderStructureDTO {
-
-        val folderTree = folderTreeRepo.findByType("root")
-        return getFolderStructure(folderTree.rootFolderId)
+    override fun getFolderOfUser(userId: String): GetFoldersResponseDTO {
+        val user = usersService.getUserById(userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+        val folderList = mutableListOf<String>()
+        val groupAccessList = groupAccessRepository.findAccessContainingUser(userId)
+        if (!groupAccessList.isNullOrEmpty()) {
+            groupAccessList.forEach { item ->
+                val group = userGroupsRepository.findByIdOrNull(item.groupId)!!
+                group.folderAccessList?.map { t -> t.folderId }?.let { folderList.addAll(it) }
+            }
+        }
+        val userAccess = userFolderAccessRepository.findByUserId(userId)
+        if (userAccess != null) {
+            userAccess.folderAccess.map { t -> t.folderId }?.let { folderList.addAll(it) }
+        }
+        val folders = foldersRepo.findAllById(folderList)
+        val response = GetFoldersResponseDTO(
+            userId,
+            mutableListOf(),
+        )
+        folders.forEach { item ->
+            response.folders = response.folders?.plus(getFolderStructure(item._id.toHexString()))
+        }
+        return response
     }
 
     fun getFolderStructure(folderId: String): FolderStructureDTO {

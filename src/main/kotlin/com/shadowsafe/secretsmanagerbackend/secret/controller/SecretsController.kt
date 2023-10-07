@@ -20,7 +20,7 @@ class SecretsController(
     fun saveSecrets(@RequestBody request: SaveSecretsRequestDTO): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
-            secretsService.saveSecrets(request)
+            secretsService.saveSecrets(request),
         )
     }
 
@@ -28,7 +28,7 @@ class SecretsController(
     fun getSecretsByUrl(@RequestParam url: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
-            secretsService.getSecretsByUrl(url)
+            secretsService.getSecretsByUrl(url),
         )
     }
 
