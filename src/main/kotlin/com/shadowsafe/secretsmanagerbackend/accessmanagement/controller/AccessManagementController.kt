@@ -15,12 +15,12 @@ class AccessManagementController(
     private val accessManagementService: AccessManagementService,
 ) : AppController() {
 
-    @PostMapping("/access/groups")
+    @PostMapping("/access")
     fun saveFolder(@RequestBody request: AddAccessForFoldersRequestDTO): ResponseEntity<ResponseDTO> {
         val userId = getCurrentAuthenticatedUserId()
         accessManagementService.saveAccessForFolders(request, userId)
         return createSuccessResponse(
-            "Success",
+            "Successfully added access",
             null,
         )
     }
