@@ -2,9 +2,7 @@ package com.shadowsafe.secretsmanagerbackend.secret.dto
 
 import com.shadowsafe.secretsmanagerbackend.shared.IDTO
 
-data class SecretByUrlResponseDTO(
-        var secretId : String,
-        var username : String
+data class SecretByIdResponseDTO(
+        var username : String,
+        var password : String
 ) : IDTO
-
-
