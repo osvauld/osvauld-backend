@@ -48,7 +48,7 @@ class UsersServiceImpl(
                 users.map {
                     usersResponseDTOList.add(
                         UsersResponseDTO(
-                            _id = it._id.toHexString(),
+                            userId = it._id.toHexString(),
                             username = it.email,
                             isAdmin = it.isAdmin,
                             name = it.name,

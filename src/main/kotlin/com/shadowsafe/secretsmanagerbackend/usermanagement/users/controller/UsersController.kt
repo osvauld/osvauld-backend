@@ -16,7 +16,7 @@ class UsersController(
     private val usersService: UsersService,
 ) : AppController() {
     @GetMapping("/users")
-    fun getAllSecrets(): ResponseEntity<ResponseDTO> {
+    fun getAllUsers(): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
             usersService.getAllUsers(),
