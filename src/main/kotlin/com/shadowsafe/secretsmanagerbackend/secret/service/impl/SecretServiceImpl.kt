@@ -92,9 +92,10 @@ class SecretServiceImpl(
 
         urlEntity.secretIds.forEach { secretId ->
 
-            var secret = secretsRepository.findById(secretId).get()
+            val secret = secretsRepository.findById(secretId).get()
 
-            var secretByUrlResponseDTO = SecretByUrlResponseDTO(
+            val secretByUrlResponseDTO = SecretByUrlResponseDTO(
+                secretId = secret._id.toHexString(),
                 username = secret.credentials.single {
                     it.fieldKey.lowercase() == "username"
                 }.fieldValue,
@@ -105,6 +106,25 @@ class SecretServiceImpl(
         return secretsByUrlResponseDTO
     }
 
+    override fun getSecretById(request: String): SecretByIdResponseDTO {
+
+        if (secretsRepository.findById(request).isEmpty){
+            throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND)
+        }
+        val secret = secretsRepository.findById(request).get()
+
+        val secretByIdResponseDTO = SecretByIdResponseDTO(
+                username = secret.credentials.filter{
+                    it.fieldKey.lowercase() == "username"
+                }.map { res -> res.fieldValue }.first().toString(),
+                password = secret.credentials.filter{
+                    it.fieldKey.lowercase() == "password"
+                }.map { res -> res.fieldValue }.first().toString()
+        )
+        return secretByIdResponseDTO
+
+    }
+
     override fun getAllUrls(): URLsListDTO {
         var urlSecrets = urlSecretMappingRepository.findAll()
 
@@ -112,7 +132,7 @@ class SecretServiceImpl(
             it.url
         }
         return URLsListDTO(
-            urls = urls,
+            urls = urls
         )
     }
 }

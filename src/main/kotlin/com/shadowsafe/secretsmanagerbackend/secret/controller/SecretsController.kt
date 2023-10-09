@@ -24,11 +24,19 @@ class SecretsController(
         )
     }
 
-    @GetMapping("/secrets")
+    @GetMapping("/secretsByUrl")
     fun getSecretsByUrl(@RequestParam url: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
             "Success",
             secretsService.getSecretsByUrl(url),
+        )
+    }
+
+    @GetMapping("/secretsById")
+    fun getSecretsById(@RequestParam id: String): ResponseEntity<ResponseDTO> {
+        return createSuccessResponse(
+                "Success",
+                secretsService.getSecretById(id)
         )
     }
 

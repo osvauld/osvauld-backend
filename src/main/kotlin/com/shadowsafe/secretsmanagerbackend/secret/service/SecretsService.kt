@@ -2,6 +2,7 @@ package com.shadowsafe.secretsmanagerbackend.secret.service
 
 import SecretByUrlResponseDTOList
 import com.shadowsafe.secretsmanagerbackend.secret.dto.SaveSecretsRequestDTO
+import com.shadowsafe.secretsmanagerbackend.secret.dto.SecretByIdResponseDTO
 import com.shadowsafe.secretsmanagerbackend.secret.dto.SecretsResponseDTO
 import com.shadowsafe.secretsmanagerbackend.secret.dto.URLsListDTO
 import org.springframework.stereotype.Service
@@ -10,5 +11,6 @@ import org.springframework.stereotype.Service
 interface SecretsService {
     fun saveSecrets(request: SaveSecretsRequestDTO): SecretsResponseDTO
     fun getSecretsByUrl(request: String): SecretByUrlResponseDTOList
+    fun getSecretById(request: String): SecretByIdResponseDTO
     fun getAllUrls(): URLsListDTO
 }
