@@ -94,4 +94,12 @@ class UserGroupsServiceImpl(
         group.folderAccessList = if (group.folderAccessList.isNullOrEmpty()) listOf(access) else group.folderAccessList!!.plus(access)
         userGroupsRepository.save(group)
     }
+
+    override fun checkIfUserPresentInGroups(userId: String, groupIds: List<String>): Boolean {
+        val groupsAccess = groupAccessRepository.findAllById(groupIds)
+        groupsAccess.forEach { item ->
+            if (item.accessList.find { i -> i.userId == userId } != null) return true
+        }
+        return false
+    }
 }

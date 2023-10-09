@@ -29,7 +29,7 @@ class SecretServiceImpl(
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         }
 
-        val parentFolder = foldersRepository.findById(request.parent).get()
+        var parentFolder = foldersRepository.findById(request.parent).get()
         var secretKeysList = arrayListOf<String>()
         val autofillKeyValues = listOf("username", "password", "url")
         var urlVal = "none"
@@ -72,10 +72,11 @@ class SecretServiceImpl(
             }
         }
 
-        parentFolder.secrets.plus(secretsEntity._id.toHexString())
+        parentFolder.secrets = parentFolder.secrets.plus(secretsEntity._id.toHexString())
         foldersRepository.save(parentFolder)
 
         return SecretsResponseDTO(
+            id = secretsEntity._id.toHexString(),
             name = secretsEntity.name,
             credentials = secretsEntity.credentials,
             parent = secretsEntity.parent.last(),

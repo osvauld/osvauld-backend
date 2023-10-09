@@ -5,6 +5,7 @@ import com.shadowsafe.secretsmanagerbackend.shared.IDTO
 import java.time.LocalDateTime
 
 data class SecretsResponseDTO(
+    val id: String?,
     val name: String?,
     var credentials: List<CredentialsEntity>?,
     var parent: String,

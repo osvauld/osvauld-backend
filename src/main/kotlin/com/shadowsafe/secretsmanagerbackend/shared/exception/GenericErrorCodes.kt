@@ -8,4 +8,5 @@ enum class GenericErrorCodes(val defaultMessage: String, val messageProperty: St
     GROUP_NOT_FOUND("Group not found", ""),
     USER_ALREADY_EXISTS("User already exits", ""),
     AUTHENTICATION_EXCEPTION("Authentication Exception", ""),
+    USER_HAS_NO_ACCESS("User has no access to this folder", ""),
 }

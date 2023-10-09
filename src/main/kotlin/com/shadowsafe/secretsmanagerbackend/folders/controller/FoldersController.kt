@@ -19,18 +19,20 @@ class FoldersController(
 
     @GetMapping("/folders/{id}")
     fun getFolderDetails(@PathVariable(name = "id") id: String): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
             "Success",
-            foldersService.getFolder(id),
+            foldersService.getFolder(id, userId),
         )
     }
 
     @PostMapping("/folders")
     fun saveFolder(@RequestBody request: FolderRequestDTO): ResponseEntity<ResponseDTO> {
         val userId = getCurrentAuthenticatedUserId()
+        foldersService.saveFolders(request, userId)
         return createSuccessResponse(
             "Success",
-            foldersService.saveFolders(request, userId),
+            null,
         )
     }
 

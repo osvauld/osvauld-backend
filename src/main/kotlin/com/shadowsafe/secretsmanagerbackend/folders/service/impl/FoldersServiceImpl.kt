@@ -8,12 +8,14 @@ import com.shadowsafe.secretsmanagerbackend.folders.model.FolderTree
 import com.shadowsafe.secretsmanagerbackend.folders.repo.FolderTreeRepository
 import com.shadowsafe.secretsmanagerbackend.folders.repo.FoldersRepository
 import com.shadowsafe.secretsmanagerbackend.folders.service.FoldersService
+import com.shadowsafe.secretsmanagerbackend.secret.dto.SecretsResponseDTO
 import com.shadowsafe.secretsmanagerbackend.secret.model.SecretsEntity
 import com.shadowsafe.secretsmanagerbackend.secret.repository.SecretsRepository
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericErrorCodes
 import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UserFolderAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.data.repository.findByIdOrNull
@@ -29,13 +31,21 @@ class FoldersServiceImpl(
     private val userGroupsRepository: UserGroupsRepository,
     private val userFolderAccessRepository: UserFolderAccessRepository,
     private val usersService: UsersService,
+    private val userGroupsService: UserGroupsService,
 ) : FoldersService {
 
-    override fun getFolder(id: String): FolderResponseDTO {
+    override fun getFolder(id: String, userId: String): FolderResponseDTO {
         val folder = foldersRepo.findById(id)
         if (folder.isEmpty) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         } else {
+            if (userGroupsService.checkIfUserPresentInGroups(
+                    userId,
+                    folder.get().groupAccessList!!.map { it.groupId },
+                )
+            ) {
+                throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
+            }
             val folderEntity = folder.get()
             val secretsList = mutableListOf<SecretsEntity>()
 
@@ -55,14 +65,22 @@ class FoldersServiceImpl(
                 folderEntity.label,
                 folderEntity.parents,
                 folderEntity.children,
-                resultList,
+                resultList.map { SecretsResponseDTO(
+                    id = it._id.toHexString(),
+                    name= it.name,
+                    credentials = it.credentials,
+                    parent = it.parent.last(),
+                    description = it.description,
+                    createdAt = it.createdAt,
+                    updatedAt = it.updatedAt
+                ) },
                 folderEntity.createdAt,
                 folderEntity.updatedAt,
             )
         }
     }
 
-    override fun saveFolders(folderRequest: FolderRequestDTO, userId: String): FolderStructureDTO {
+    override fun saveFolders(folderRequest: FolderRequestDTO, userId: String) {
         var folderEntity: FolderEntity
 
         if (!folderRequest.parent.isNullOrEmpty()) {
@@ -105,7 +123,7 @@ class FoldersServiceImpl(
                 SecretUserAccessType.OWNER,
             ),
         )
-        return getFolderStructure(folderEntity.parents.first())
+
     }
 
     override fun createNewFolderStructureForOrganisation(): FolderTreeDTO {
@@ -157,7 +175,7 @@ class FoldersServiceImpl(
             userId,
             mutableListOf(),
         )
-        folders.forEach { item ->
+        organiseFolderTrees(folders.toList()).forEach { item ->
             response.folders = response.folders?.plus(getFolderStructure(item._id.toHexString()))
         }
         return response
@@ -178,5 +196,17 @@ class FoldersServiceImpl(
         }
 
         return folderStructureDTO
+    }
+
+    fun organiseFolderTrees(folderList: List<FolderEntity>): List<FolderEntity> {
+        var organisedList = folderList
+        folderList.forEach { item ->
+            var isChild = false
+            item.parents.forEach { p ->
+                if (folderList.find { c -> c._id.toHexString() == p } != null) isChild = true
+            }
+            if (isChild) organisedList = organisedList.filter { o -> o != item }
+        }
+        return organisedList
     }
 }

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service
 
 @Service
 interface FoldersService {
-    fun getFolder(id: String): FolderResponseDTO
-    fun saveFolders(request: FolderRequestDTO, userId: String): FolderStructureDTO
+    fun getFolder(id: String, userId: String): FolderResponseDTO
+    fun saveFolders(request: FolderRequestDTO, userId: String)
     fun createNewFolderStructureForOrganisation(): FolderTreeDTO
     fun getFolderOfUser(userId: String): GetFoldersResponseDTO
 }
