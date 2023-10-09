@@ -17,4 +17,6 @@ interface UserGroupsService {
     fun removeUserFromGroup(userId: String, groupId: String)
 
     fun addFolderAccess(groupId: String, access: GroupFolderAccessEntity)
+
+    fun checkIfUserPresentInGroups(userId: String, groupId: List<String>): Boolean
 }
