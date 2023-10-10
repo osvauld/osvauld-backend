@@ -199,7 +199,7 @@ class FoldersServiceImpl(
             val response = GetUsersOfFolder(folderId, mutableListOf())
             val folder = folder.get()
             if (folder.userAccessList != null) {
-                response.users.plus(folder.userAccessList!!.map { item -> FolderUserDTO(item.userId, item.userId, null) })
+                response.users = response.users.plus(folder.userAccessList!!.map { item -> FolderUserDTO(item.userId, item.userId, null) })
             }
             val usersList = mutableListOf<FolderUserDTO>()
             folder.groupAccessList!!.forEach { item ->
@@ -217,6 +217,7 @@ class FoldersServiceImpl(
                     },
                 )
             }
+            response.users = response.users.plus(usersList)
             return response
         }
     }
