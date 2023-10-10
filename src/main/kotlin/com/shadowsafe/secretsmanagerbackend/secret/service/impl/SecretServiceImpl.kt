@@ -107,22 +107,20 @@ class SecretServiceImpl(
     }
 
     override fun getSecretById(request: String): SecretByIdResponseDTO {
-
-        if (secretsRepository.findById(request).isEmpty){
+        if (secretsRepository.findById(request).isEmpty) {
             throw GenericException(GenericErrorCodes.SECRET_NOT_FOUND)
         }
         val secret = secretsRepository.findById(request).get()
 
         val secretByIdResponseDTO = SecretByIdResponseDTO(
-                username = secret.credentials.filter{
-                    it.fieldKey.lowercase() == "username"
-                }.map { res -> res.fieldValue }.first().toString(),
-                password = secret.credentials.filter{
-                    it.fieldKey.lowercase() == "password"
-                }.map { res -> res.fieldValue }.first().toString()
+            username = secret.credentials.filter {
+                it.fieldKey.lowercase() == "username"
+            }.map { res -> res.fieldValue }.first().toString(),
+            password = secret.credentials.filter {
+                it.fieldKey.lowercase() == "password"
+            }.map { res -> res.fieldValue }.first().toString(),
         )
         return secretByIdResponseDTO
-
     }
 
     override fun getAllUrls(): URLsListDTO {
@@ -132,7 +130,7 @@ class SecretServiceImpl(
             it.url
         }
         return URLsListDTO(
-            urls = urls
+            urls = urls,
         )
     }
 }

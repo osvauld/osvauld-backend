@@ -10,4 +10,6 @@ interface GroupAccessRepository : MongoRepository<GroupAccessEntity, String> {
 
     @Query("{ accessList: { \$elemMatch: { userId: ?0 } } }")
     fun findAccessContainingUser(userId: String): List<GroupAccessEntity>?
+
+    fun findByGroupId(groupId: String): GroupAccessEntity?
 }

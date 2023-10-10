@@ -16,6 +16,7 @@ import com.shadowsafe.secretsmanagerbackend.shared.exception.GenericException
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.GroupAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.repository.UserGroupsRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.service.UserGroupsService
+import com.shadowsafe.secretsmanagerbackend.usermanagement.users.dto.GroupResponseDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.repository.UserFolderAccessRepository
 import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersService
 import org.springframework.data.repository.findByIdOrNull
@@ -42,7 +43,7 @@ class FoldersServiceImpl(
             if (userGroupsService.checkIfUserPresentInGroups(
                     userId,
                     folder.get().groupAccessList!!.map { it.groupId },
-                )
+                ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
             ) {
                 throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
             }
@@ -65,15 +66,17 @@ class FoldersServiceImpl(
                 folderEntity.label,
                 folderEntity.parents,
                 folderEntity.children,
-                resultList.map { SecretsResponseDTO(
-                    id = it._id.toHexString(),
-                    name= it.name,
-                    credentials = it.credentials,
-                    parent = it.parent.last(),
-                    description = it.description,
-                    createdAt = it.createdAt,
-                    updatedAt = it.updatedAt
-                ) },
+                resultList.map {
+                    SecretsResponseDTO(
+                        id = it._id.toHexString(),
+                        name = it.name,
+                        credentials = it.credentials,
+                        parent = it.parent.last(),
+                        description = it.description,
+                        createdAt = it.createdAt,
+                        updatedAt = it.updatedAt,
+                    )
+                },
                 folderEntity.createdAt,
                 folderEntity.updatedAt,
             )
@@ -123,7 +126,6 @@ class FoldersServiceImpl(
                 SecretUserAccessType.OWNER,
             ),
         )
-
     }
 
     override fun createNewFolderStructureForOrganisation(): FolderTreeDTO {
@@ -179,6 +181,44 @@ class FoldersServiceImpl(
             response.folders = response.folders?.plus(getFolderStructure(item._id.toHexString()))
         }
         return response
+    }
+
+    override fun getUsersInFolder(folderId: String, userId: String): GetUsersOfFolder {
+        val folder = foldersRepo.findById(folderId)
+        if (folder.isEmpty) {
+            throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
+        } else {
+            if (userGroupsService.checkIfUserPresentInGroups(
+                    userId,
+                    folder.get().groupAccessList!!.map { it.groupId },
+                ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
+            ) {
+                throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
+            }
+
+            val response = GetUsersOfFolder(folderId, mutableListOf())
+            val folder = folder.get()
+            if (folder.userAccessList != null) {
+                response.users.plus(folder.userAccessList!!.map { item -> FolderUserDTO(item.userId, item.userId, null) })
+            }
+            val usersList = mutableListOf<FolderUserDTO>()
+            folder.groupAccessList!!.forEach { item ->
+                val groupAccess = groupAccessRepository.findByGroupId(item.groupId) ?: throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
+
+                usersList.addAll(
+                    groupAccess.accessList.map { k ->
+                        FolderUserDTO(
+                            k.userId,
+                            item.type.name,
+                            listOf(
+                                GroupResponseDTO(item.groupId, item.name),
+                            ),
+                        )
+                    },
+                )
+            }
+            return response
+        }
     }
 
     fun getFolderStructure(folderId: String): FolderStructureDTO {
