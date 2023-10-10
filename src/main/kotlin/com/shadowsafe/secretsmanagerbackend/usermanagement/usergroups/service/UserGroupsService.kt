@@ -4,6 +4,7 @@ import com.shadowsafe.secretsmanagerbackend.accessmanagement.model.GroupFolderAc
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserGroupRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.AddUserToUserGroupRequestDTO
 import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.dto.GetUsersInGroupsResponseDTO
+import com.shadowsafe.secretsmanagerbackend.usermanagement.usergroups.model.UserGroupsEntity
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,4 +20,6 @@ interface UserGroupsService {
     fun addFolderAccess(groupId: String, access: GroupFolderAccessEntity)
 
     fun checkIfUserPresentInGroups(userId: String, groupId: List<String>): Boolean
+
+    fun getGroupById(id: String): UserGroupsEntity
 }

@@ -102,4 +102,8 @@ class UserGroupsServiceImpl(
         }
         return false
     }
+
+    override fun getGroupById(id: String): UserGroupsEntity {
+        return userGroupsRepository.findByIdOrNull(id) ?: throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
+    }
 }

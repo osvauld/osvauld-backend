@@ -32,7 +32,7 @@ class AccessManagementServiceImpl(
                         folder.groupAccessList = folder.groupAccessList?.plus(
                             SecretGroupAccessEntity(
                                 groupId = item.groupId,
-                                name = "",
+                                name = userGroupsService.getGroupById(item.groupId).name,
                                 type = item.type,
                             ),
                         )
@@ -41,7 +41,7 @@ class AccessManagementServiceImpl(
                     folder.groupAccessList = listOf(
                         SecretGroupAccessEntity(
                             groupId = item.groupId,
-                            name = "",
+                            name = userGroupsService.getGroupById(item.groupId).name,
                             type = item.type,
                         ),
                     )

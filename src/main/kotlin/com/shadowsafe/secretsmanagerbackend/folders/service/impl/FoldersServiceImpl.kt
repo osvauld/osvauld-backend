@@ -199,7 +199,18 @@ class FoldersServiceImpl(
             val response = GetUsersOfFolder(folderId, mutableListOf())
             val folder = folder.get()
             if (folder.userAccessList != null) {
-                response.users = response.users.plus(folder.userAccessList!!.map { item -> FolderUserDTO(item.userId, item.userId, null) })
+                response.users = response.users.plus(
+                    folder.userAccessList!!.map { item ->
+                        val user = usersService.getUserById(item.userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+                        FolderUserDTO(
+                            userId = item.userId,
+                            name = user.name,
+                            username = user.email,
+                            accessType = item.type.name,
+                            group = null,
+                        )
+                    },
+                )
             }
             val usersList = mutableListOf<FolderUserDTO>()
             folder.groupAccessList!!.forEach { item ->
@@ -207,10 +218,13 @@ class FoldersServiceImpl(
 
                 usersList.addAll(
                     groupAccess.accessList.map { k ->
+                        val user = usersService.getUserById(k.userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
                         FolderUserDTO(
-                            k.userId,
-                            item.type.name,
-                            listOf(
+                            userId = k.userId,
+                            name = user.name,
+                            username = user.email,
+                            accessType = item.type.name,
+                            group = listOf(
                                 GroupResponseDTO(item.groupId, item.name),
                             ),
                         )
