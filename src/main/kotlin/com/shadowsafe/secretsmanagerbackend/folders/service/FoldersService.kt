@@ -9,4 +9,5 @@ interface FoldersService {
     fun saveFolders(request: FolderRequestDTO, userId: String)
     fun createNewFolderStructureForOrganisation(): FolderTreeDTO
     fun getFolderOfUser(userId: String): GetFoldersResponseDTO
+    fun getUsersInFolder(folderId: String, userId: String): GetUsersOfFolder
 }

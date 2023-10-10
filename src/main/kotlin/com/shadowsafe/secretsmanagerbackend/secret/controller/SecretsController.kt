@@ -35,8 +35,8 @@ class SecretsController(
     @GetMapping("/secretsById")
     fun getSecretsById(@RequestParam id: String): ResponseEntity<ResponseDTO> {
         return createSuccessResponse(
-                "Success",
-                secretsService.getSecretById(id)
+            "Success",
+            secretsService.getSecretById(id),
         )
     }
 

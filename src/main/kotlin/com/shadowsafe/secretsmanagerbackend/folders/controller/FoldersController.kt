@@ -6,11 +6,7 @@ import com.shadowsafe.secretsmanagerbackend.shared.aop.AppController
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class FoldersController(
@@ -36,11 +32,12 @@ class FoldersController(
         )
     }
 
-    @PostMapping("/folders/structure")
-    fun createNewFolderStructureForOrganisation(): ResponseEntity<ResponseDTO> {
+    @GetMapping("/folder/user")
+    fun getFolderUser(@RequestParam id: String): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
-            "Success",
-            foldersService.createNewFolderStructureForOrganisation(),
+            "Successfully fetched user in group",
+            foldersService.getUsersInFolder(id, userId),
         )
     }
 
