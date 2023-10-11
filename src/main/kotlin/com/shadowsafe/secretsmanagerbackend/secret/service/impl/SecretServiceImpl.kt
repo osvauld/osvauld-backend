@@ -88,9 +88,9 @@ class SecretServiceImpl(
 
     override fun getSecretsByUrl(request: String): SecretByUrlResponseDTOList {
         val secretsByUrlResponseDTO = SecretByUrlResponseDTOList()
-        val urlEntity = urlSecretMappingRepository.findByUrl(request).get()
-
-        urlEntity.secretIds.forEach { secretId ->
+        val urlEntity = urlSecretMappingRepository.findByUrl(request)
+        if (urlEntity.isEmpty) return SecretByUrlResponseDTOList()
+        urlEntity.get().secretIds.forEach { secretId ->
 
             val secret = secretsRepository.findById(secretId).get()
 
