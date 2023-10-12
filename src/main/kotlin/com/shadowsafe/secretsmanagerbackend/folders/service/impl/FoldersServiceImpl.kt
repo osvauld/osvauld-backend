@@ -22,6 +22,8 @@ import com.shadowsafe.secretsmanagerbackend.usermanagement.users.service.UsersSe
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.HashSet
 
 @Service
 class FoldersServiceImpl(
@@ -188,35 +190,44 @@ class FoldersServiceImpl(
         if (folder.isEmpty) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         } else {
+            val folder = folder.get()
             if (userGroupsService.checkIfUserPresentInGroups(
                     userId,
-                    folder.get().groupAccessList!!.map { it.groupId },
-                ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
+                    folder.groupAccessList!!.map { it.groupId },
+                ) || folder.userAccessList!!.map { it.userId }.contains(userId)
             ) {
                 throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
             }
 
-            val response = GetUsersOfFolder(folderId, mutableListOf())
-            val folder = folder.get()
-            if (folder.userAccessList != null) {
-                response.users = response.users.plus(
-                    folder.userAccessList!!.map { item ->
-                        val user = usersService.getUserById(item.userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
-                        FolderUserDTO(
-                            userId = item.userId,
-                            name = user.name,
-                            username = user.email,
-                            accessType = item.type.name,
-                            group = null,
-                        )
-                    },
-                )
-            }
-            val usersList = mutableListOf<FolderUserDTO>()
+            return GetUsersOfFolder(
+                folderId,
+                getUsersWithAccessToFolderAndParents(folder).toList()
+            )
+        }
+    }
+
+    fun getUsersWithAccessToFolderAndParents(folder: FolderEntity): Set<FolderUserDTO> {
+        var usersOfFolder: HashSet<FolderUserDTO> = hashSetOf<FolderUserDTO>()
+        if (folder.userAccessList != null) {
+            usersOfFolder = usersOfFolder.plus(
+                folder.userAccessList!!.map { item ->
+                    val user = usersService.getUserById(item.userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
+                    FolderUserDTO(
+                        userId = item.userId,
+                        name = user.name,
+                        username = user.email,
+                        accessType = item.type.name,
+                        group = null,
+                    )
+                },
+            ) as HashSet<FolderUserDTO>
+        }
+
+        if (folder.groupAccessList != null) {
             folder.groupAccessList!!.forEach { item ->
                 val groupAccess = groupAccessRepository.findByGroupId(item.groupId) ?: throw GenericException(GenericErrorCodes.GROUP_NOT_FOUND)
 
-                usersList.addAll(
+                usersOfFolder = usersOfFolder.plus(
                     groupAccess.accessList.map { k ->
                         val user = usersService.getUserById(k.userId) ?: throw GenericException(GenericErrorCodes.USER_NOT_FOUND)
                         FolderUserDTO(
@@ -229,11 +240,13 @@ class FoldersServiceImpl(
                             ),
                         )
                     },
-                )
+                ) as HashSet<FolderUserDTO>
             }
-            response.users = response.users.plus(usersList)
-            return response
         }
+
+        return if (folder.parents.isNotEmpty())
+            usersOfFolder.plus(getUsersWithAccessToFolderAndParents(foldersRepo.findByIdOrNull(folder.parents.last())!!))
+        else usersOfFolder
     }
 
     fun getFolderStructure(folderId: String): FolderStructureDTO {
