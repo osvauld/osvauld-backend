@@ -24,7 +24,7 @@ class SecretServiceImpl(
 
 ) : SecretsService {
 
-    override fun saveSecrets(request: SaveSecretsRequestDTO): SecretsResponseDTO {
+    override fun saveSecrets(request: SaveSecretsRequestDTO, userId: String): SecretsResponseDTO {
         if (!foldersRepository.existsById(request.parent)) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         }
@@ -36,7 +36,7 @@ class SecretServiceImpl(
 
         request.credentials?.forEach { cred ->
             secretKeysList.add(cred.fieldKey.lowercase())
-            if (cred.fieldKey.lowercase() == "url") urlVal = cred.fieldValue
+            if (cred.fieldKey.lowercase() == "url") urlVal = cred.fieldValue.replace(Regex("/\$"), "")
         }
 
         val secretType = if (secretKeysList.containsAll(autofillKeyValues)) {
@@ -58,15 +58,16 @@ class SecretServiceImpl(
         )
 
         if (secretType == SECRET_TYPE_AUTOFILL) {
-            if (urlSecretMappingRepository.findByUrl(urlVal).isEmpty) {
+            if (urlSecretMappingRepository.findByUrlAndUserId(urlVal, userId).isEmpty) {
                 urlSecretMappingRepository.save(
                     UrlSecretMappingEntity(
+                        userId = userId,
                         secretIds = listOf(secretsEntity._id.toHexString()),
                         url = urlVal,
                     ),
                 )
             } else {
-                val urlEntity = urlSecretMappingRepository.findByUrl(urlVal).get()
+                val urlEntity = urlSecretMappingRepository.findByUrlAndUserId(urlVal, userId).get()
                 urlEntity.secretIds += secretsEntity._id.toHexString()
                 urlSecretMappingRepository.save(urlEntity)
             }
@@ -86,9 +87,9 @@ class SecretServiceImpl(
         )
     }
 
-    override fun getSecretsByUrl(request: String): SecretByUrlResponseDTOList {
+    override fun getSecretsByUrl(request: String, userId: String): SecretByUrlResponseDTOList {
         val secretsByUrlResponseDTO = SecretByUrlResponseDTOList()
-        val urlEntity = urlSecretMappingRepository.findByUrl(request)
+        val urlEntity = urlSecretMappingRepository.findByUrlAndUserId(request.replace(Regex("/\$"), ""), userId)
         if (urlEntity.isEmpty) return SecretByUrlResponseDTOList()
         urlEntity.get().secretIds.forEach { secretId ->
 
