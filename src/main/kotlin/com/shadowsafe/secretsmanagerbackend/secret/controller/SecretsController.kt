@@ -2,6 +2,7 @@ package com.shadowsafe.secretsmanagerbackend.secret.controller
 
 import com.shadowsafe.secretsmanagerbackend.secret.dto.SaveSecretsRequestDTO
 import com.shadowsafe.secretsmanagerbackend.secret.service.SecretsService
+import com.shadowsafe.secretsmanagerbackend.shared.aop.AppController
 import com.shadowsafe.secretsmanagerbackend.shared.rest.ResponseDTO
 import com.shadowsafe.secretsmanagerbackend.shared.rest.createSuccessResponse
 import org.springframework.http.ResponseEntity
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class SecretsController(
     private val secretsService: SecretsService,
-) {
+): AppController() {
     @GetMapping("/secrets/health")
     fun healthCheck(): String {
         return "OK"
@@ -18,17 +19,19 @@ class SecretsController(
 
     @PostMapping("/secrets")
     fun saveSecrets(@RequestBody request: SaveSecretsRequestDTO): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
             "Success",
-            secretsService.saveSecrets(request),
+            secretsService.saveSecrets(request, userId),
         )
     }
 
     @GetMapping("/secretsByUrl")
     fun getSecretsByUrl(@RequestParam url: String): ResponseEntity<ResponseDTO> {
+        val userId = getCurrentAuthenticatedUserId()
         return createSuccessResponse(
             "Success",
-            secretsService.getSecretsByUrl(url),
+            secretsService.getSecretsByUrl(url, userId),
         )
     }
 

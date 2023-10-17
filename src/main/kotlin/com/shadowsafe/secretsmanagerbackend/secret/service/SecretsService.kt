@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service
 
 @Service
 interface SecretsService {
-    fun saveSecrets(request: SaveSecretsRequestDTO): SecretsResponseDTO
-    fun getSecretsByUrl(request: String): SecretByUrlResponseDTOList
+    fun saveSecrets(request: SaveSecretsRequestDTO, userId: String): SecretsResponseDTO
+    fun getSecretsByUrl(request: String, userId: String): SecretByUrlResponseDTOList
     fun getSecretById(request: String): SecretByIdResponseDTO
     fun getAllUrls(): URLsListDTO
 }
