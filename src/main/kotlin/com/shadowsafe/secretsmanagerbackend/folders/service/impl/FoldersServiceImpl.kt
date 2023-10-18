@@ -42,10 +42,12 @@ class FoldersServiceImpl(
         if (folder.isEmpty) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         } else {
-            if (userGroupsService.checkIfUserPresentInGroups(
-                    userId,
-                    folder.get().groupAccessList!!.map { it.groupId },
-                ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
+            if (!(
+                    userGroupsService.checkIfUserPresentInGroups(
+                        userId,
+                        folder.get().groupAccessList!!.map { it.groupId },
+                    ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
+                    )
             ) {
                 throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
             }
@@ -201,7 +203,7 @@ class FoldersServiceImpl(
 
             return GetUsersOfFolder(
                 folderId,
-                getUsersWithAccessToFolderAndParents(folder).toList()
+                getUsersWithAccessToFolderAndParents(folder).toList(),
             )
         }
     }
@@ -244,9 +246,11 @@ class FoldersServiceImpl(
             }
         }
 
-        return if (folder.parents.isNotEmpty())
+        return if (folder.parents.isNotEmpty()) {
             usersOfFolder.plus(getUsersWithAccessToFolderAndParents(foldersRepo.findByIdOrNull(folder.parents.last())!!))
-        else usersOfFolder
+        } else {
+            usersOfFolder
+        }
     }
 
     fun getFolderStructure(folderId: String): FolderStructureDTO {
