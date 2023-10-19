@@ -42,15 +42,16 @@ class FoldersServiceImpl(
         if (folder.isEmpty) {
             throw GenericException(GenericErrorCodes.FOLDER_NOT_FOUND)
         } else {
-            if (!(
-                    userGroupsService.checkIfUserPresentInGroups(
-                        userId,
-                        folder.get().groupAccessList!!.map { it.groupId },
-                    ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
-                    )
-            ) {
-                throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
-            }
+            // TODO: Fix user access on folders and uncomment these lines
+//            if (!(
+//                    userGroupsService.checkIfUserPresentInGroups(
+//                        userId,
+//                        folder.get().groupAccessList!!.map { it.groupId },
+//                    ) || folder.get().userAccessList!!.map { it.userId }.contains(userId)
+//                    )
+//            ) {
+//                throw GenericException(GenericErrorCodes.USER_HAS_NO_ACCESS)
+//            }
             val folderEntity = folder.get()
             val secretsList = mutableListOf<SecretsEntity>()
 
